@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Profile</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f3f4f6;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 24px;
+    }
+
+    .profile-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .profile-pic-wrapper {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      margin-right: 20px;
+    }
+
+    .profile-pic-wrapper img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .edit-icon {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background-color: orange;
+      color: white;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 0 3px rgba(0,0,0,0.3);
+    }
+
+    .edit-icon:hover {
+      background-color: darkorange;
+    }
+
+    #uploadInput {
+      display: none;
+    }
+
+    .section {
+      background-color: #f9fafb;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .section-header h3 {
+      margin: 0;
+      font-size: 1.2em;
+      color: #444;
+    }
+
+    .edit-btn, .save-btn {
+      background-color: orange;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9em;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+    }
+
+    .info-grid div {
+      color: #333;
+    }
+
+    .info-grid label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+      color: #555;
+    }
+
+    .info-grid input {
+      width: 100%;
+      padding: 6px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <div class="profile-pic-wrapper">
+        <img id="profileImage" src="Bruce Wayne.jfif" alt="Profile" />
+        <label for="uploadInput" class="edit-icon" title="Change photo">&#9998;</label>
+        <input type="file" id="uploadInput" accept="image/*" />
+      </div>
+      <div>
+        <h2 id="fullName">Natashia Khaleira</h2>
+        <p id="userRole">Admin</p>
+        <p id="location">Leeds, United Kingdom</p>
+      </div>
+    </div>
+
+    <!-- Personal Info -->
+<div class="section">
+  <div class="section-header">
+    <h3>Personal Information</h3>
+    <button id="editPersonalBtn" class="edit-btn">Edit</button>
+  </div>
+  <div class="info-grid" id="personalInfo">
+    <div><label>First Name:</label><span id="firstName">Natashia</span></div>
+    <div><label>Last Name:</label><span id="lastName">Khaleira</span></div>
+    <div><label>Date of Birth:</label><span id="dob">12-10-1990</span></div>
+    <div><label>Email Address:</label><span id="email">info@binary-fusion.com</span></div>
+    <div><label>Phone Number:</label><span id="phone">(+62) 821 2554-5846</span></div>
+    <div><label>Alternative Phone:</label><span id="altPhone">(+62) 812 3333-2222</span></div>
+    <div><label>User Role:</label><span id="role">Admin</span></div>
+    <div><label>Gender:</label><span id="gender">Female</span></div>
+  </div>
+</div>
+
+    <!-- Address Info -->
+    <div class="section">
+      <div class="section-header">
+        <h3>Address</h3>
+        <button id="editAddressBtn" class="edit-btn">Edit</button>
+      </div>
+      <div class="info-grid" id="addressInfo">
+        <div><label>Country:</label><span id="country">United Kingdom</span></div>
+        <div><label>City:</label><span id="city">Leeds, East London</span></div>
+        <div><label>Postal Code:</label><span id="postal">ERT 1254</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.onload = function () {
+      const savedData = JSON.parse(localStorage.getItem('profileData'));
+      if (savedData) {
+        for (let key in savedData) {
+          const element = document.getElementById(key);
+          if (element) {
+            if (key === 'profileImage') {
+              element.src = savedData[key];
+            } else {
+              element.textContent = savedData[key];
+            }
+          }
+        }
+      }
+    };
+  
+    function saveProfileData() {
+      const keys = ['firstName', 'lastName', 'dob', 'email', 'phone', 'altPhone', 'role', 'gender', 'marital', 'country', 'city', 'postal'];
+      const data = {};
+  
+      keys.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) data[id] = el.textContent;
+      });
+  
+      const first = data['firstName'] || '';
+      const last = data['lastName'] || '';
+      const city = data['city'] || '';
+      const country = data['country'] || '';
+  
+      document.getElementById('fullName').textContent = `${first} ${last}`;
+      document.getElementById('location').textContent = `${city}, ${country}`;
+      document.getElementById('userRole').textContent = data['role'];
+  
+      data['fullName'] = `${first} ${last}`;
+      data['location'] = `${city}, ${country}`;
+  
+      const img = document.getElementById('profileImage');
+      if (img) data['profileImage'] = img.src;
+  
+      localStorage.setItem('profileData', JSON.stringify(data));
+    }
+  
+    function makeEditable(sectionId, btnId) {
+      const section = document.getElementById(sectionId);
+      const button = document.getElementById(btnId);
+      const isEditing = button.textContent === 'Save';
+  
+      if (!isEditing) {
+        [...section.children].forEach(div => {
+          const span = div.querySelector('span');
+          if (span) {
+            let input;
+            if (span.id === 'gender') {
+              input = document.createElement('select');
+              input.innerHTML = `
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              `;
+              input.value = span.textContent;
+            } else if (span.id === 'marital') {
+              input = document.createElement('select');
+              input.innerHTML = `
+                <option value="Single">Single</option>
+                <option value="Married">Married</option>
+                <option value="Divorced">Divorced</option>
+                <option value="Widowed">Widowed</option>
+              `;
+              input.value = span.textContent;
+            } else {
+              input = document.createElement('input');
+              input.type = 'text';
+              input.value = span.textContent;
+            }
+  
+            input.id = span.id;
+            div.replaceChild(input, span);
+          }
+        });
+        button.textContent = 'Save';
+        button.classList.remove('edit-btn');
+        button.classList.add('save-btn');
+      } else {
+        [...section.children].forEach(div => {
+          const input = div.querySelector('input, select');
+          if (input) {
+            const span = document.createElement('span');
+            span.id = input.id;
+            span.textContent = input.value;
+            div.replaceChild(span, input);
+          }
+        });
+        button.textContent = 'Edit';
+        button.classList.remove('save-btn');
+        button.classList.add('edit-btn');
+  
+        saveProfileData();
+      }
+    }
+  
+    document.getElementById('editPersonalBtn').onclick = () => makeEditable('personalInfo', 'editPersonalBtn');
+    document.getElementById('editAddressBtn').onclick = () => makeEditable('addressInfo', 'editAddressBtn');
+  
+    document.getElementById('uploadInput').addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (evt) {
+          document.getElementById('profileImage').src = evt.target.result;
+          saveProfileData();
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  </script>
+  
+  
+</body>
+</html>

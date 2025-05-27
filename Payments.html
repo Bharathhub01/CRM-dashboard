@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Payment Management</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    body {
+      font-family: serif;
+      background: #eef2f7;
+      margin: 0;
+      padding: 2rem;
+    }
+
+    .crm-container {
+      max-width: 1100px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+
+    h2, h3 {
+      color: #2c3e50;
+      margin-bottom: 1rem;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem 2rem;
+      margin-bottom: 2rem;
+    }
+
+    input, select, textarea, button {
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    textarea {
+      grid-column: 1 / -1;
+      resize: vertical;
+    }
+
+    button[type="submit"] {
+      background-color: #3498db;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #2980b9;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .actions button {
+      background: #27ae60;
+      color: white;
+      font-weight: bold;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .actions button:hover {
+      background: #1e8449;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background: #f9f9f9;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      border-left: 6px solid #3498db;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      flex-wrap: wrap;
+    }
+
+    li .info {
+      flex: 1;
+      font-size: 0.95rem;
+      margin-right: 1rem;
+    }
+
+    li button {
+      background-color: #e74c3c;
+      border: none;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    li button:hover {
+      background-color: #c0392b;
+    }
+  </style>
+</head>
+<body>
+
+<div class="crm-container">
+  <h2>Payment Management</h2>
+
+  <form id="crmPaymentForm">
+    <input type="text" id="payer" placeholder="Customer/Supplier Name" required />
+    <input type="text" id="payerId" placeholder="Customer/Supplier ID" required />
+    <input type="number" id="amount" placeholder="Amount (₹)" required />
+    <input type="date" id="paymentDate" required />
+    <select id="paymentType">
+      <option value="customer">Customer</option>
+      <option value="supplier">Supplier</option>
+    </select>
+    <select id="paymentMethod">
+      <option value="cash">Cash</option>
+      <option value="bank_transfer">Bank Transfer</option>
+      <option value="upi">UPI</option>
+      <option value="cheque">Cheque</option>
+    </select>
+    <input type="text" id="referenceNo" placeholder="Reference Number (if any)" />
+    <textarea id="remarks" rows="2" placeholder="Remarks"></textarea>
+    <button type="submit">Add Payment</button>
+  </form>
+
+  <h3>Filters</h3>
+  <div class="filters">
+    <select id="filterType">
+      <option value="">All Types</option>
+      <option value="customer">Customer</option>
+      <option value="supplier">Supplier</option>
+    </select>
+    <input type="text" id="filterId" placeholder="Filter by ID" />
+    <input type="date" id="filterDate" />
+  </div>
+
+  <div class="actions">
+    <button onclick="exportToExcel()">Export to Excel</button>
+  </div>
+
+  <h3>Payment Records</h3>
+  <ul id="crmPaymentList"></ul>
+</div>
+
+<script>
+  const crmPaymentForm = document.getElementById('crmPaymentForm');
+  const crmPaymentList = document.getElementById('crmPaymentList');
+
+  function loadCrmPayments() {
+    const payments = JSON.parse(localStorage.getItem('crm_payments')) || [];
+    const type = document.getElementById('filterType').value;
+    const id = document.getElementById('filterId').value.trim();
+    const date = document.getElementById('filterDate').value;
+
+    const filtered = payments.filter(p =>
+      (!type || p.type === type) &&
+      (!id || p.payerId.includes(id)) &&
+      (!date || p.date === date)
+    );
+
+    crmPaymentList.innerHTML = '';
+    filtered.forEach((p, i) => {
+      crmPaymentList.innerHTML += `
+        <li>
+          <div class="info">
+            <strong>${p.date}</strong><br>
+            ${p.payer} (${p.type})<br>
+            ID: ${p.payerId} | ₹${p.amount}<br>
+            Method: ${p.method} | Ref: ${p.ref || 'N/A'}<br>
+            ${p.remarks ? 'Remarks: ' + p.remarks + '<br>' : ''}
+            <button onclick="generateReceipt(${i})">Receipt</button>
+          </div>
+          <button onclick="deleteCrmPayment(${i})">Delete</button>
+        </li>
+      `;
+    });
+  }
+
+  crmPaymentForm.addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  const payer = document.getElementById('payer').value.trim();
+  const payerId = document.getElementById('payerId').value.trim();
+  const amount = parseFloat(document.getElementById('amount').value);
+  const date = document.getElementById('paymentDate').value;
+  const type = document.getElementById('paymentType').value;
+  const method = document.getElementById('paymentMethod').value;
+  const ref = document.getElementById('referenceNo').value.trim();
+  const remarks = document.getElementById('remarks').value.trim();
+
+  // Validate payer name (only letters and spaces)
+  const nameRegex = /^[A-Za-z\s]+$/;
+  if (!nameRegex.test(payer)) {
+    alert("Please enter a valid name (letters and spaces only).");
+    return;
+  }
+
+  // Validate amount
+  if (isNaN(amount) || amount <= 0) {
+    alert("Please enter a valid positive number for amount.");
+    return;
+  }
+
+  const payment = {
+    payer,
+    payerId,
+    amount,
+    type,
+    method,
+    ref,
+    remarks,
+    date
+  };
+
+  const payments = JSON.parse(localStorage.getItem('crm_payments')) || [];
+  payments.push(payment);
+  localStorage.setItem('crm_payments', JSON.stringify(payments));
+  crmPaymentForm.reset();
+  loadCrmPayments();
+});
+
+
+  function deleteCrmPayment(index) {
+    const payments = JSON.parse(localStorage.getItem('crm_payments')) || [];
+    payments.splice(index, 1);
+    localStorage.setItem('crm_payments', JSON.stringify(payments));
+    loadCrmPayments();
+  }
+
+  function exportToExcel() {
+    const payments = JSON.parse(localStorage.getItem('crm_payments')) || [];
+    const ws = XLSX.utils.json_to_sheet(payments);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Payments");
+    XLSX.writeFile(wb, "CRM_Payments.xlsx");
+  }
+
+  function generateReceipt(index) {
+    const payments = JSON.parse(localStorage.getItem('crm_payments')) || [];
+    const p = payments[index];
+    const win = window.open('', 'Receipt');
+    win.document.write(`<h2>Payment Receipt</h2>`);
+    win.document.write(`<p><strong>Date:</strong> ${p.date}</p>`);
+    win.document.write(`<p><strong>Name:</strong> ${p.payer}</p>`);
+    win.document.write(`<p><strong>ID:</strong> ${p.payerId}</p>`);
+    win.document.write(`<p><strong>Type:</strong> ${p.type}</p>`);
+    win.document.write(`<p><strong>Amount:</strong> ₹${p.amount}</p>`);
+    win.document.write(`<p><strong>Method:</strong> ${p.method}</p>`);
+    win.document.write(`<p><strong>Ref:</strong> ${p.ref || 'N/A'}</p>`);
+    win.document.write(`<p><strong>Remarks:</strong> ${p.remarks || 'N/A'}</p>`);
+    win.print();
+    win.close();
+  }
+
+  document.getElementById('filterType').addEventListener('change', loadCrmPayments);
+  document.getElementById('filterId').addEventListener('input', loadCrmPayments);
+  document.getElementById('filterDate').addEventListener('change', loadCrmPayments);
+  window.onload = loadCrmPayments;
+</script>
+
+</body>
+</html>

@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workforce Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body class=" bg-white p-6">
+  <div class="max-w-7xl mx-auto mt-8">
+    <h1 class="text-3xl font-bold mb-4">Workforce Management</h1>
+
+    <!-- Section Buttons with Subtle Colors -->
+  <div class="mb-6">
+    <button class="bg-blue-200 text-blue-800 px-4 py-2 rounded" onclick="toggleSection('employeeSection')">Employee Database</button>
+    <button class="bg-green-200 text-green-800 px-4 py-2 rounded ml-4" onclick="toggleSection('taskSection')">Task Assignment</button>
+    <button class="bg-yellow-200 text-yellow-800 px-4 py-2 rounded ml-4" onclick="toggleSection('performanceSection')">Performance Tracking</button>
+    <button class="bg-red-200 text-red-800 px-4 py-2 rounded ml-4" onclick="toggleSection('allocationSection')">Workforce Allocation</button>
+    <button class="bg-gray-300 text-gray-800 px-4 py-2 rounded ml-4" onclick="showAllSections()">Show All</button>
+  </div>
+
+
+    <!-- Employee Database Section -->
+    <div id="employeeSection" class="hidden">
+      <h2 class="text-xl font-semibold mb-2">Employee Database</h2>
+      <form id="employeeForm" class="space-y-2">
+        <div class="flex gap-2">
+          <input type="hidden" id="editEmployeeIndex">
+          <input type="text" id="employeeId" placeholder="Employee ID" class="border p-2 flex-1 rounded" required />
+          <div class="flex-1">
+          <input type="text" id="employeeName" placeholder="Employee Name"
+            class="border p-2 w-full rounded" required
+            pattern="[A-Za-z\s]+" maxlength="50"
+            oninput="validateEmployeeName()" />
+          <p id="nameError" class="text-red-500 text-sm mt-1 hidden">Please enter letters and spaces only (A–Z, a–z).</p>
+        </div>
+        <input type="text" id="employeeRole" placeholder="Role (e.g. Collector)" class="border p-2 flex-1 rounded" required />
+          <input type="tel" id="employeeContact" placeholder="Phone Number (10 digits)" class="border p-2 flex-1 rounded"
+            required pattern="\d{10}" maxlength="10" oninvalid="this.setCustomValidity('Please enter a valid 10-digit phone number')"
+            oninput="this.setCustomValidity('')" />
+          <button type="submit" class="bg-green-500 text-white px-4 rounded">Save</button>
+        </div>
+      </form>
+      <table class="w-full mt-4 text-left border">
+        <thead class="bg-gray-200">
+          <tr><th class="p-2">Employee ID</th><th class="p-2">Name</th><th class="p-2">Role</th><th class="p-2">Contact</th><th class="p-2">Actions</th></tr>
+        </thead>
+        <tbody id="employeeTable"></tbody>
+      </table>
+    </div>
+
+    <!-- Task Assignment Section -->
+    <div id="taskSection" class="hidden">
+      <h2 class="text-xl font-semibold mb-2">Task Assignment</h2>
+      <form id="taskForm" class="space-y-2">
+        <div class="flex gap-2">
+          <input type="hidden" id="editTaskIndex">
+          <div class="flex-1">
+          <input type="text" id="employeeName" placeholder="Employee Name"
+            class="border p-2 w-full rounded" required
+            pattern="[A-Za-z\s]+" maxlength="50"
+            oninput="validateEmployeeName()" />
+          <p id="nameError" class="text-red-500 text-sm mt-1 hidden">Please enter letters and spaces only (A–Z, a–z).</p>
+        </div>
+          <input type="text" id="taskDescription" placeholder="Task Description" class="border p-2 flex-1 rounded" required />
+          <input type="date" id="taskDueDate" class="border p-2 flex-1 rounded" required />
+          <button type="submit" class="bg-green-500 text-white px-4 rounded">Save</button>
+        </div>
+      </form>
+      <table class="w-full mt-4 text-left border">
+        <thead class="bg-gray-200">
+          <tr><th class="p-2">Employee</th><th class="p-2">Task</th><th class="p-2">Due Date</th><th class="p-2">Actions</th></tr>
+        </thead>
+        <tbody id="taskTable"></tbody>
+      </table>
+    </div>
+
+    <!-- Performance Tracking Section -->
+    <div id="performanceSection" class="hidden">
+      <h2 class="text-xl font-semibold mb-2">Performance Tracking</h2>
+      <form id="performanceForm" class="space-y-2">
+        <div class="flex gap-2">
+          <input type="hidden" id="editPerformanceIndex">
+          <div class="flex-1">
+          <input type="text" id="employeeName" placeholder="Employee Name"
+            class="border p-2 w-full rounded" required
+            pattern="[A-Za-z\s]+" maxlength="50"
+            oninput="validateEmployeeName()" />
+          <p id="nameError" class="text-red-500 text-sm mt-1 hidden">Please enter letters and spaces only (A–Z, a–z).</p>
+        </div>
+          <input type="text" id="performanceTask" placeholder="Task" class="border p-2 flex-1 rounded" required />
+          <input type="number" id="performanceScore" placeholder="Score (1-10)" class="border p-2 flex-1 rounded" required min="1" max="10"/>
+          <button type="submit" class="bg-green-500 text-white px-4 rounded">Save</button>
+        </div>
+      </form>
+      <table class="w-full mt-4 text-left border">
+        <thead class="bg-gray-200">
+          <tr><th class="p-2">Employee</th><th class="p-2">Task</th><th class="p-2">Score</th><th class="p-2">Actions</th></tr>
+        </thead>
+        <tbody id="performanceTable"></tbody>
+      </table>
+    </div>
+
+    <!-- Workforce Allocation Section -->
+    <div id="allocationSection" class="hidden">
+      <h2 class="text-xl font-semibold mb-2">Workforce Allocation</h2>
+      <form id="allocationForm" class="space-y-2">
+        <div class="flex gap-2">
+          <input type="hidden" id="editAllocationIndex">
+          <input type="text" id="allocationDepartment" placeholder="Department (e.g. Processing)" class="border p-2 flex-1 rounded" required />
+          <input type="number" id="allocationNumber" placeholder="Number of Workers" class="border p-2 flex-1 rounded" required min="1"/>
+          <button type="submit" class="bg-green-500 text-white px-4 rounded">Save</button>
+        </div>
+      </form>
+      <table class="w-full mt-4 text-left border">
+        <thead class="bg-gray-200">
+          <tr><th class="p-2">Department</th><th class="p-2">Number of Workers</th><th class="p-2">Actions</th></tr>
+        </thead>
+        <tbody id="allocationTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Common functionality for section toggling
+    function toggleSection(sectionId) {
+      const sections = document.querySelectorAll('div[id$="Section"]');
+      sections.forEach(section => section.classList.add('hidden'));
+      document.getElementById(sectionId).classList.remove('hidden');
+    }
+
+    function showAllSections() {
+      const sections = document.querySelectorAll('div[id$="Section"]');
+      sections.forEach(section => section.classList.remove('hidden'));
+    }
+
+    // Employee Management
+    let employees = JSON.parse(localStorage.getItem('employees')) || [];
+    const employeeForm = document.getElementById('employeeForm');
+    const employeeTable = document.getElementById('employeeTable');
+
+    employeeForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const id = document.getElementById('employeeId').value.trim();
+      const name = document.getElementById('employeeName').value.trim();
+      const role = document.getElementById('employeeRole').value.trim();
+      const contact = document.getElementById('employeeContact').value.trim();
+      const editIndex = document.getElementById('editEmployeeIndex').value;
+
+      if (editIndex === "") {
+        employees.push({ id, name, role, contact });
+      } else {
+        employees[editIndex] = { id, name, role, contact };
+        document.getElementById('editEmployeeIndex').value = "";
+      }
+
+      employeeForm.reset();
+      localStorage.setItem('employees', JSON.stringify(employees));
+      renderEmployeeTable();
+    });
+
+    function renderEmployeeTable() {
+      employeeTable.innerHTML = employees.map((emp, index) => `
+        <tr>
+          <td class="p-2">${emp.id}</td>
+          <td class="p-2">${emp.name}</td>
+          <td class="p-2">${emp.role}</td>
+          <td class="p-2">${emp.contact}</td>
+          <td class="p-2 flex items-center space-x-2">
+            <button onclick="editEmployee(${index})" class="text-blue-500 hover:text-blue-700">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5m-10-7l8 8M15 9l-6 6" />
+              </svg>
+            </button>
+            <button onclick="deleteEmployee(${index})" class="text-red-500 hover:text-red-700">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4m-4 0a1 1 0 00-1 1v1h6V4a1 1 0 00-1-1m-4 0h4" />
+              </svg>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function editEmployee(index) {
+      const emp = employees[index];
+      document.getElementById('employeeId').value = emp.id;
+      document.getElementById('employeeName').value = emp.name;
+      document.getElementById('employeeRole').value = emp.role;
+      document.getElementById('employeeContact').value = emp.contact;
+      document.getElementById('editEmployeeIndex').value = index;
+    }
+
+    function deleteEmployee(index) {
+      employees.splice(index, 1);
+      localStorage.setItem('employees', JSON.stringify(employees));
+      renderEmployeeTable();
+    }
+
+    // Task Management (similar to Employee Management above)
+    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    const taskForm = document.getElementById('taskForm');
+    const taskTable = document.getElementById('taskTable');
+
+    taskForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const employee = document.getElementById('taskEmployee').value.trim();
+      const description = document.getElementById('taskDescription').value.trim();
+      const dueDate = document.getElementById('taskDueDate').value.trim();
+      const editIndex = document.getElementById('editTaskIndex').value;
+
+      if (editIndex === "") {
+        tasks.push({ employee, description, dueDate });
+      } else {
+        tasks[editIndex] = { employee, description, dueDate };
+        document.getElementById('editTaskIndex').value = "";
+      }
+
+      taskForm.reset();
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+      renderTaskTable();
+    });
+
+    function renderTaskTable() {
+      taskTable.innerHTML = tasks.map((task, index) => `
+        <tr>
+          <td class="p-2">${task.employee}</td>
+          <td class="p-2">${task.description}</td>
+          <td class="p-2">${task.dueDate}</td>
+          <td class="p-2 flex items-center space-x-2">
+            <button onclick="editTask(${index})" class="text-blue-500 hover:text-blue-700">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5m-10-7l8 8M15 9l-6 6" />
+              </svg>
+            </button>
+            <button onclick="deleteTask(${index})" class="text-red-500 hover:text-red-700">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4m-4 0a1 1 0 00-1 1v1h6V4a1 1 0 00-1-1m-4 0h4" />
+              </svg>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function editTask(index) {
+      const task = tasks[index];
+      document.getElementById('taskEmployee').value = task.employee;
+      document.getElementById('taskDescription').value = task.description;
+      document.getElementById('taskDueDate').value = task.dueDate;
+      document.getElementById('editTaskIndex').value = index;
+    }
+
+    function deleteTask(index) {
+      tasks.splice(index, 1);
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+      renderTaskTable();
+    }
+
+    // Initially render tables from localStorage data
+    renderEmployeeTable();
+    renderTaskTable();
+
+    // Performance Management
+let performanceRecords = JSON.parse(localStorage.getItem('performance')) || [];
+const performanceForm = document.getElementById('performanceForm');
+const performanceTable = document.getElementById('performanceTable');
+
+performanceForm.addEventListener('submit', function (e) {
+  e.preventDefault();
+  const employee = document.getElementById('performanceEmployee').value.trim();
+  const task = document.getElementById('performanceTask').value.trim();
+  const score = document.getElementById('performanceScore').value.trim();
+  const editIndex = document.getElementById('editPerformanceIndex').value;
+
+  if (editIndex === "") {
+    performanceRecords.push({ employee, task, score });
+  } else {
+    performanceRecords[editIndex] = { employee, task, score };
+    document.getElementById('editPerformanceIndex').value = "";
+  }
+
+  performanceForm.reset();
+  localStorage.setItem('performance', JSON.stringify(performanceRecords));
+  renderPerformanceTable();
+});
+
+function renderPerformanceTable() {
+  performanceTable.innerHTML = performanceRecords.map((record, index) => `
+    <tr>
+      <td class="p-2">${record.employee}</td>
+      <td class="p-2">${record.task}</td>
+      <td class="p-2">${record.score}</td>
+      <td class="p-2 flex items-center space-x-2">
+        <button onclick="editPerformance(${index})" class="text-blue-500 hover:text-blue-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M11 5H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5m-10-7l8 8M15 9l-6 6" />
+          </svg>
+        </button>
+        <button onclick="deletePerformance(${index})" class="text-red-500 hover:text-red-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4m-4 0a1 1 0 00-1 1v1h6V4a1 1 0 00-1-1m-4 0h4" />
+          </svg>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function editPerformance(index) {
+  const record = performanceRecords[index];
+  document.getElementById('performanceEmployee').value = record.employee;
+  document.getElementById('performanceTask').value = record.task;
+  document.getElementById('performanceScore').value = record.score;
+  document.getElementById('editPerformanceIndex').value = index;
+}
+
+function deletePerformance(index) {
+  performanceRecords.splice(index, 1);
+  localStorage.setItem('performance', JSON.stringify(performanceRecords));
+  renderPerformanceTable();
+}
+
+// Initially render the performance table from localStorage data
+renderPerformanceTable();
+
+// Workforce Allocation Management
+let allocations = JSON.parse(localStorage.getItem('allocations')) || [];
+const allocationForm = document.getElementById('allocationForm');
+const allocationTable = document.getElementById('allocationTable');
+
+allocationForm.addEventListener('submit', function (e) {
+  e.preventDefault();
+  const department = document.getElementById('allocationDepartment').value.trim();
+  const numberOfWorkers = document.getElementById('allocationNumber').value.trim();
+  const editIndex = document.getElementById('editAllocationIndex').value;
+
+  if (editIndex === "") {
+    allocations.push({ department, numberOfWorkers });
+  } else {
+    allocations[editIndex] = { department, numberOfWorkers };
+    document.getElementById('editAllocationIndex').value = "";
+  }
+
+  allocationForm.reset();
+  localStorage.setItem('allocations', JSON.stringify(allocations));
+  renderAllocationTable();
+});
+
+function renderAllocationTable() {
+  allocationTable.innerHTML = allocations.map((allocation, index) => `
+    <tr>
+      <td class="p-2">${allocation.department}</td>
+      <td class="p-2">${allocation.numberOfWorkers}</td>
+      <td class="p-2 flex items-center space-x-2">
+        <button onclick="editAllocation(${index})" class="text-blue-500 hover:text-blue-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M11 5H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5m-10-7l8 8M15 9l-6 6" />
+          </svg>
+        </button>
+        <button onclick="deleteAllocation(${index})" class="text-red-500 hover:text-red-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4m-4 0a1 1 0 00-1 1v1h6V4a1 1 0 00-1-1m-4 0h4" />
+          </svg>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function editAllocation(index) {
+  const allocation = allocations[index];
+  document.getElementById('allocationDepartment').value = allocation.department;
+  document.getElementById('allocationNumber').value = allocation.numberOfWorkers;
+  document.getElementById('editAllocationIndex').value = index;
+}
+
+function deleteAllocation(index) {
+  allocations.splice(index, 1);
+  localStorage.setItem('allocations', JSON.stringify(allocations));
+  renderAllocationTable();
+}
+
+// Initially render the allocation table from localStorage data
+renderAllocationTable();
+
+// Show All functionality
+showAllBtn.addEventListener('click', function () {
+  renderAllocationTable();
+  allocationSection.classList.remove('hidden');  // Show the allocation section if it's hidden
+});
+
+allocationForm.addEventListener('submit', function (e) {
+  e.preventDefault();
+  const department = document.getElementById('allocationDepartment').value.trim();
+  const numberOfWorkers = document.getElementById('allocationNumber').value.trim();
+  const editIndex = document.getElementById('editAllocationIndex').value;
+
+  if (editIndex === "") {
+    allocations.push({ department, numberOfWorkers });
+  } else {
+    allocations[editIndex] = { department, numberOfWorkers };
+    document.getElementById('editAllocationIndex').value = "";
+  }
+
+  allocationForm.reset();
+  localStorage.setItem('allocations', JSON.stringify(allocations));
+  renderAllocationTable();
+});
+
+function renderAllocationTable() {
+  allocationTable.innerHTML = allocations.map((allocation, index) => `
+    <tr>
+      <td class="p-2">${allocation.department}</td>
+      <td class="p-2">${allocation.numberOfWorkers}</td>
+      <td class="p-2 flex items-center space-x-2">
+        <button onclick="editAllocation(${index})" class="text-blue-500 hover:text-blue-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M11 5H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5m-10-7l8 8M15 9l-6 6" />
+          </svg>
+        </button>
+        <button onclick="deleteAllocation(${index})" class="text-red-500 hover:text-red-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4m-4 0a1 1 0 00-1 1v1h6V4a1 1 0 00-1-1m-4 0h4" />
+          </svg>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function editAllocation(index) {
+  const allocation = allocations[index];
+  document.getElementById('allocationDepartment').value = allocation.department;
+  document.getElementById('allocationNumber').value = allocation.numberOfWorkers;
+  document.getElementById('editAllocationIndex').value = index;
+}
+
+function deleteAllocation(index) {
+  allocations.splice(index, 1);
+  localStorage.setItem('allocations', JSON.stringify(allocations));
+  renderAllocationTable();
+}
+
+// Initially render the allocation table from localStorage data
+renderAllocationTable();
+
+  function validateEmployeeName() {
+    const nameInput = document.getElementById('employeeName');
+    const nameError = document.getElementById('nameError');
+    const valid = /^[A-Za-z\s]+$/.test(nameInput.value);
+
+    if (!valid && nameInput.value !== '') {
+      nameError.classList.remove('hidden');
+    } else {
+      nameError.classList.add('hidden');
+    }
+  }
+
+  // Optional: re-validate on form submit
+  document.getElementById('employeeForm').addEventListener('submit', function (e) {
+    const nameInput = document.getElementById('employeeName');
+    const nameError = document.getElementById('nameError');
+
+    if (!/^[A-Za-z\s]+$/.test(nameInput.value)) {
+      nameError.classList.remove('hidden');
+      e.preventDefault(); // prevent form submission
+    }
+  });
+
+</script>
+</body>
+
+</html>

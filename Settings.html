@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dairy CRM Settings</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans pt-8">
+  <div class="min-h-screen flex">
+    
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-lg p-5">
+      <h2 class="text-2xl font-bold mb-6">Settings</h2>
+      <ul class="space-y-3">
+        <li><button class="w-full text-left text-blue-600 font-medium hover:underline" onclick="showSection('userSettings')">User & Roles</button></li>
+        <li><button class="w-full text-left text-blue-600 font-medium hover:underline" onclick="showSection('orgSettings')">Organization</button></li>
+        <li><button class="w-full text-left text-blue-600 font-medium hover:underline" onclick="showSection('systemSettings')">System Config</button></li>
+        <li><button class="w-full text-left text-blue-600 font-medium hover:underline" onclick="showSection('moduleSettings')">Module Preferences</button></li>
+        <li><button class="w-full text-left text-blue-600 font-medium hover:underline" onclick="showSection('notificationSettings')">Notifications</button></li>
+        <li><button class="w-full text-left text-blue-600 font-medium hover:underline" onclick="showSection('securitySettings')">Security</button></li>
+        <li><button class="w-full text-left text-blue-600 font-medium hover:underline" onclick="showSection('termsSettings')">Terms & Conditions</button></li>
+        <li><button class="w-full text-left text-blue-600 font-medium hover:underline" onclick="showSection('privacySettings')">Privacy Policy</button></li>
+      </ul>
+    </aside>
+
+    <!-- Content Area -->
+    <main class="flex-1 p-8 bg-gray-50">
+      <!-- User & Role Management -->
+    <section id="userSettings" class="hidden">
+      <h3 class="text-xl font-semibold mb-6">User & Role Management</h3>
+
+      <!-- Add New User -->
+      <form id="addUserForm" class="space-y-4">
+  <div>
+    <label for="userName" class="block text-sm font-medium text-gray-700">Name</label>
+    <input type="text" id="userName" class="mt-1 block w-full border border-gray-300 rounded-md p-2" required />
+    <p id="nameError" class="text-red-500 text-sm mt-1 hidden">Name must contain only letters and spaces.</p>
+  </div>
+  <div>
+    <label for="userEmail" class="block text-sm font-medium text-gray-700">Email</label>
+    <input type="email" id="userEmail" class="mt-1 block w-full border border-gray-300 rounded-md p-2" required />
+    <p id="emailError" class="text-red-500 text-sm mt-1 hidden">Please enter a valid email address.</p>
+  </div>
+  <div>
+    <label for="userRole" class="block text-sm font-medium text-gray-700">Role</label>
+    <select id="userRole" class="mt-1 block w-full border border-gray-300 rounded-md p-2" required>
+      <option value="">Select a role</option>
+      <option value="Admin">Admin</option>
+      <option value="Manager">Manager</option>
+      <option value="Employee">Employee</option>
+    </select>
+    <p id="roleError" class="text-red-500 text-sm mt-1 hidden">Please select a role.</p>
+  </div>
+  <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add User</button>
+</form>
+
+      <!-- User List -->
+      <div class="bg-white p-6 rounded shadow max-w-3xl">
+        <h4 class="text-lg font-medium mb-4">User List</h4>
+        <table class="w-full text-sm table-auto border">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="px-3 py-2 border">Name</th>
+              <th class="px-3 py-2 border">Email</th>
+              <th class="px-3 py-2 border">Role</th>
+              <th class="px-3 py-2 border">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="userTableBody">
+            <!-- Users will be inserted here -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Password Policy -->
+      <div class="bg-white p-6 rounded shadow mt-8 max-w-2xl">
+        <h4 class="text-lg font-medium mb-4">Password Policy</h4>
+        <form id="passwordPolicyForm" class="space-y-4">
+          <label class="flex items-center space-x-2">
+            <input type="checkbox" id="minLength" class="rounded">
+            <span>Minimum 8 characters</span>
+          </label>
+          <label class="flex items-center space-x-2">
+            <input type="checkbox" id="requireNumber" class="rounded">
+            <span>Include at least 1 number</span>
+          </label>
+          <label class="flex items-center space-x-2">
+            <input type="checkbox" id="requireSpecial" class="rounded">
+            <span>Include at least 1 special character</span>
+          </label>
+          <button type="button" onclick="savePasswordPolicy()" class="bg-blue-600 text-white px-4 py-2 rounded">
+            Save Policy
+          </button>
+        </form>
+      </div>
+    </section>
+
+
+      <!-- Organization Settings -->
+      <section id="orgSettings" class="hidden">
+        <h3 class="text-xl font-semibold mb-4">Organization Settings</h3>
+        <form class="space-y-4 max-w-lg">
+          <div>
+            <label class="block text-sm font-medium">Company Name</label>
+            <input type="text" class="w-full border rounded px-3 py-2" placeholder="DairyCo Ltd.">
+          </div>
+          <div>
+            <label class="block text-sm font-medium">Address</label>
+            <textarea class="w-full border rounded px-3 py-2" rows="3" placeholder="123 Dairy Street, Milk City"></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-medium">Logo Upload</label>
+            <input type="file" class="block mt-1">
+          </div>
+          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Save Changes</button>
+        </form>
+      </section>
+
+      <!-- System Settings -->
+      <section id="systemSettings" class="hidden">
+        <h3 class="text-xl font-semibold mb-4">System Configuration</h3>
+        <form class="space-y-4 max-w-md">
+          <div>
+            <label class="block text-sm font-medium">Default Currency</label>
+            <select class="w-full border rounded px-3 py-2">
+              <option>INR</option>
+              <option>USD</option>
+              <option>EUR</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium">Unit of Measure</label>
+            <select class="w-full border rounded px-3 py-2">
+              <option>Liters</option>
+              <option>Kilograms</option>
+            </select>
+          </div>
+          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Update</button>
+        </form>
+      </section>
+
+      <!-- Module Preferences -->
+    <section id="moduleSettings" class="hidden">
+      <h3 class="text-xl font-semibold mb-4">Module Preferences</h3>
+      <p class="mb-4 text-sm text-gray-700">Toggle the visibility of various modules based on your organization’s needs.</p>
+      <form class="space-y-4 bg-white p-6 rounded shadow max-w-xl">
+        <label class="flex items-center space-x-3">
+          <input type="checkbox" id="milkCollectionModule" class="rounded">
+          <span>Milk Collection</span>
+        </label>
+        <label class="flex items-center space-x-3">
+          <input type="checkbox" id="logisticsModule" class="rounded">
+          <span>Logistics & Delivery</span>
+        </label>
+        <label class="flex items-center space-x-3">
+          <input type="checkbox" id="employeeReviewsModule" class="rounded">
+          <span>Employee Reviews</span>
+        </label>
+        <button type="button" onclick="saveModulePreferences()" class="bg-blue-600 text-white px-4 py-2 rounded">
+          Save Module Preferences
+        </button>
+      </form>
+    </section>
+
+
+      <!-- Notifications -->
+    <section id="notificationSettings" class="hidden">
+      <h3 class="text-xl font-semibold mb-4">Notification Settings</h3>
+      <form class="space-y-6 max-w-2xl bg-white p-6 rounded shadow">
+        <div>
+          <label class="block text-sm font-medium mb-2">Preferred Notification Method</label>
+          <div class="flex items-center space-x-4">
+            <label class="flex items-center space-x-2">
+              <input type="checkbox" id="emailNotify" class="rounded">
+              <span>Email</span>
+            </label>
+            <label class="flex items-center space-x-2">
+              <input type="checkbox" id="smsNotify" class="rounded">
+              <span>SMS</span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-2">Alert Types</label>
+          <div class="grid grid-cols-2 gap-4">
+            <label class="flex items-center space-x-2">
+              <input type="checkbox" class="rounded" id="milkCollectionAlert">
+              <span>Milk Collection Updates</span>
+            </label>
+            <label class="flex items-center space-x-2">
+              <input type="checkbox" class="rounded" id="deliveryStatusAlert">
+              <span>Delivery Status</span>
+            </label>
+            <label class="flex items-center space-x-2">
+              <input type="checkbox" class="rounded" id="paymentReminderAlert">
+              <span>Payment Reminders</span>
+            </label>
+            <label class="flex items-center space-x-2">
+              <input type="checkbox" class="rounded" id="lowInventoryAlert">
+              <span>Low Inventory Warnings</span>
+            </label>
+            <label class="flex items-center space-x-2">
+              <input type="checkbox" class="rounded" id="qualityIssueAlert">
+              <span>Quality Issue Reports</span>
+            </label>
+            <label class="flex items-center space-x-2">
+              <input type="checkbox" class="rounded" id="newOrderAlert">
+              <span>New Order Notifications</span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-2">Notification Frequency</label>
+          <select id="notifyFrequency" class="w-full border rounded px-3 py-2">
+            <option>Immediately</option>
+            <option>Hourly Digest</option>
+            <option>Daily Summary</option>
+            <option>Weekly Summary</option>
+          </select>
+        </div>
+
+        <button type="button" onclick="saveNotificationSettings()" class="bg-blue-600 text-white px-4 py-2 rounded">
+          Save Notification Settings
+        </button>
+      </form>
+    </section>
+
+
+      <!-- Security -->
+      <section id="securitySettings" class="hidden">
+        <h3 class="text-xl font-semibold mb-4">Security Settings</h3>
+
+        <!-- Login Security -->
+        <div class="mb-6">
+          <h4 class="text-lg font-medium mb-2">Login Security</h4>
+          <label class="block mb-2">
+            <input type="checkbox" id="enableCaptcha" class="mr-2">
+            Enable CAPTCHA after 3 failed login attempts
+          </label>
+          <label class="block mb-2">
+            <input type="checkbox" id="lockAccount" class="mr-2">
+            Lock account after 5 failed attempts
+          </label>
+          <label class="block mb-2">
+            <input type="checkbox" id="strongPassword" class="mr-2" checked>
+            Enforce strong password policy
+          </label>
+        </div>
+
+        <!-- Two-Factor Authentication -->
+        <div class="mb-6">
+          <h4 class="text-lg font-medium mb-2">Two-Factor Authentication (2FA)</h4>
+          <label class="block mb-2">
+            <input type="checkbox" id="enable2fa" class="mr-2">
+            Enable 2FA for all users
+          </label>
+          <div id="2faSetup" class="hidden mt-2 p-4 border rounded bg-white shadow">
+            <p class="text-sm mb-2">Scan the QR code with an authenticator app:</p>
+            <div id="qrcode" class="mb-2"></div>
+            <input type="text" id="verifyOtp" placeholder="Enter OTP" class="w-full border rounded px-3 py-2">
+            <button class="mt-2 bg-blue-600 text-white px-4 py-2 rounded" onclick="verifyOtp()">Verify OTP</button>
+          </div>
+        </div>
+
+        <!-- Session Settings -->
+        <div class="mb-6">
+          <h4 class="text-lg font-medium mb-2">Session Settings</h4>
+          <label class="block mb-2">
+            Auto logout after
+            <select id="sessionTimeout" class="ml-2 border rounded px-2 py-1">
+              <option value="15">15 minutes</option>
+              <option value="30" selected>30 minutes</option>
+              <option value="60">60 minutes</option>
+            </select>
+            of inactivity
+          </label>
+          <button class="mt-2 bg-red-600 text-white px-4 py-2 rounded" onclick="logoutAllSessions()">Log out from all devices</button>
+        </div>
+
+        <button class="mt-4 bg-blue-600 text-white px-4 py-2 rounded" onclick="saveSecuritySettings()">Save Security Settings</button>
+      </section>
+
+      <!-- Terms & Conditions -->
+      <section id="termsSettings" class="hidden">
+        <h3 class="text-xl font-semibold mb-4">Terms & Conditions</h3>
+        <div class="bg-white p-6 rounded shadow max-w-4xl text-sm space-y-4 overflow-y-auto max-h-[70vh]">
+          <p><strong>1. Introduction:</strong> By accessing or using our platform, you agree to be bound by these Terms and Conditions. If you do not agree, please do not use the site.</p>
+          
+          <p><strong>2. Eligibility:</strong> Users must be authorized representatives of dairy farms, cooperatives, suppliers, distributors, or businesses in the dairy industry.</p>
+          
+          <p><strong>3. Services Offered:</strong> Our platform provides CRM tools, product listing, communication, and reporting services tailored to the dairy industry.</p>
+          
+          <p><strong>4. Account Responsibilities:</strong> You are responsible for securing your account and reporting unauthorized use immediately.</p>
+          
+          <p><strong>5. Data Usage & Privacy:</strong> We collect operational data to improve services. Your information is protected as per our Privacy Policy.</p>
+          
+          <p><strong>6. Product & Pricing Information:</strong> Product listings must be accurate and updated. Prices must include all applicable taxes.</p>
+          
+          <p><strong>7. Quality & Compliance:</strong> All dairy products must comply with local food safety standards. Non-compliance may result in removal or suspension.</p>
+          
+          <p><strong>8. Payments:</strong> Transactions must be completed using approved channels. The platform is not liable for external payment disputes.</p>
+          
+          <p><strong>9. Prohibited Activities:</strong> You may not engage in fraud, misinformation, or upload harmful content on our platform.</p>
+          
+          <p><strong>10. Termination:</strong> We may suspend accounts that violate our policies or disrupt services.</p>
+          
+          <p><strong>11. Limitation of Liability:</strong> We are not liable for third-party issues, disputes, or user-induced data losses.</p>
+          
+          <p><strong>12. Changes to Terms:</strong> We may revise these terms. Continued use after updates implies acceptance.</p>
+          
+          <p><strong>13. Governing Law:</strong> These terms are governed by the laws of your operating country/state.</p>
+          
+          <p><strong>14. Contact:</strong> For questions, email <a href="mailto:support@yourdodladairy.com" class="text-blue-600 underline">support@yourdodladairy.com</a> or call +91 8756576875.</p>
+        </div>
+        <button class="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Acknowledge & Save</button>
+      </section>
+
+
+      <!-- Privacy Policy -->
+    <section id="privacySettings" class="hidden">
+      <h3 class="text-xl font-semibold mb-4">Privacy Policy</h3>
+      <div class="bg-white p-6 rounded shadow max-w-4xl text-sm space-y-4 overflow-y-auto max-h-[70vh]">
+        <p><strong>1. Introduction:</strong> This Privacy Policy outlines how we collect, use, and safeguard your data when you use our Dairy CRM platform.</p>
+        
+        <p><strong>2. Data We Collect:</strong> We may collect the following types of data:
+          <ul class="list-disc list-inside ml-4">
+            <li>Business contact information (name, email, phone)</li>
+            <li>Dairy farm or supplier records</li>
+            <li>Milk collection and distribution data</li>
+            <li>Transaction and payment logs</li>
+            <li>User credentials and access logs</li>
+          </ul>
+        </p>
+        
+        <p><strong>3. How We Use Your Data:</strong> We use the data to:
+          <ul class="list-disc list-inside ml-4">
+            <li>Deliver CRM functionalities (e.g., logistics, sales, communication)</li>
+            <li>Provide customer support</li>
+            <li>Analyze performance and generate reports</li>
+            <li>Improve platform features and user experience</li>
+          </ul>
+        </p>
+        
+        <p><strong>4. Data Sharing:</strong> We do not sell your data. We may share it with:
+          <ul class="list-disc list-inside ml-4">
+            <li>Third-party services for hosting or analytics (under strict agreements)</li>
+            <li>Government/regulatory bodies if legally required</li>
+          </ul>
+        </p>
+        
+        <p><strong>5. Cookies & Tracking:</strong> Our site may use cookies for session management and analytics. You may disable cookies in your browser settings, but this may affect functionality.</p>
+        
+        <p><strong>6. Data Security:</strong> We implement industry-standard security measures including:
+          <ul class="list-disc list-inside ml-4">
+            <li>Encrypted connections (SSL/TLS)</li>
+            <li>Password hashing and user access controls</li>
+            <li>Session timeout and monitoring</li>
+          </ul>
+        </p>
+        
+        <p><strong>7. Data Retention:</strong> We retain your data only as long as necessary to fulfill business or legal obligations.</p>
+        
+        <p><strong>8. User Rights:</strong> You have the right to:
+          <ul class="list-disc list-inside ml-4">
+            <li>Access and update your data</li>
+            <li>Request deletion of your account and records</li>
+            <li>Withdraw consent for non-essential data usage</li>
+          </ul>
+        </p>
+        
+        <p><strong>9. Changes to This Policy:</strong> We may update this policy from time to time. Updates will be reflected here with the effective date.</p>
+        
+        <p><strong>10. Contact Us:</strong> For privacy-related questions, contact us at  
+        <a href="mailto:privacy@yourdairycrm.com" class="text-blue-600 underline">privacy@yourdodladairy.com</a>.</p>
+      </div>
+      <button class="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Acknowledge & Save</button>
+    </section>
+
+
+ <script>
+    function showSection(id) {
+      document.querySelectorAll('main section').forEach(section => {
+        section.style.display = 'none';
+      });
+      document.getElementById(id).style.display = 'block';
+    }
+    // Default section
+    showSection('userSettings');
+
+    function generateQrCode(url) {
+      new QRCode(document.getElementById("qrcode"), {
+        text: url,
+        width: 128,
+        height: 128,
+      });
+    }
+
+    document.getElementById('enable2fa').addEventListener('change', function () {
+      const setupBox = document.getElementById('2faSetup');
+      if (this.checked) {
+        setupBox.classList.remove('hidden');
+        generateQrCode("otpauth://totp/DairyCRM?secret=JBSWY3DPEHPK3PXP"); // Sample
+      } else {
+        setupBox.classList.add('hidden');
+        document.getElementById('qrcode').innerHTML = '';
+      }
+    });
+
+    function verifyOtp() {
+      const otp = document.getElementById("verifyOtp").value;
+      alert("Verifying OTP: " + otp + " (You would verify on backend)");
+    }
+
+    function logoutAllSessions() {
+      alert("All sessions invalidated. (Implement this on server)");
+    }
+
+    function saveSecuritySettings() {
+      const settings = {
+        enableCaptcha: document.getElementById("enableCaptcha").checked,
+        lockAccount: document.getElementById("lockAccount").checked,
+        strongPassword: document.getElementById("strongPassword").checked,
+        enable2fa: document.getElementById("enable2fa").checked,
+        sessionTimeout: document.getElementById("sessionTimeout").value
+      };
+      console.log("Saving settings...", settings);
+      alert("Security settings saved (send to backend)");
+    }
+
+    function saveNotificationSettings() {
+      const settings = {
+        email: document.getElementById('emailNotify').checked,
+        sms: document.getElementById('smsNotify').checked,
+        alerts: {
+          milkCollection: document.getElementById('milkCollectionAlert').checked,
+          deliveryStatus: document.getElementById('deliveryStatusAlert').checked,
+          paymentReminder: document.getElementById('paymentReminderAlert').checked,
+          lowInventory: document.getElementById('lowInventoryAlert').checked,
+          qualityIssue: document.getElementById('qualityIssueAlert').checked,
+          newOrder: document.getElementById('newOrderAlert').checked,
+        },
+        frequency: document.getElementById('notifyFrequency').value
+      };
+      localStorage.setItem('notificationSettings', JSON.stringify(settings));
+      alert('Notification preferences saved!');
+    }
+
+    function saveModulePreferences() {
+      const modules = {
+        milkCollection: document.getElementById('milkCollectionModule').checked,
+        logistics: document.getElementById('logisticsModule').checked,
+        employeeReviews: document.getElementById('employeeReviewsModule').checked,
+      };
+      localStorage.setItem('modulePreferences', JSON.stringify(modules));
+      alert('Module preferences saved!');
+    }
+
+    function loadModulePreferences() {
+      const stored = localStorage.getItem('modulePreferences');
+      if (stored) {
+        const modules = JSON.parse(stored);
+        document.getElementById('milkCollectionModule').checked = modules.milkCollection;
+        document.getElementById('logisticsModule').checked = modules.logistics;
+        document.getElementById('employeeReviewsModule').checked = modules.employeeReviews;
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', loadModulePreferences);
+
+    const addUserForm = document.getElementById("addUserForm");
+    const userTableBody = document.getElementById("userTableBody");
+    const nameInput = document.getElementById("userName");
+    const emailInput = document.getElementById("userEmail");
+    const roleSelect = document.getElementById("userRole");
+    const nameError = document.getElementById("nameError");
+    const emailError = document.getElementById("emailError");
+    const roleError = document.getElementById("roleError");
+    let editingIndex = -1;
+
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    function isValidName(name) {
+      return /^[A-Za-z\s]+$/.test(name);
+    }
+
+    function loadUsers() {
+      const users = JSON.parse(localStorage.getItem("crmUsers")) || [];
+      userTableBody.innerHTML = "";
+      users.forEach((user, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td class="border px-3 py-2">${user.name}</td>
+          <td class="border px-3 py-2">${user.email}</td>
+          <td class="border px-3 py-2">${user.role}</td>
+          <td class="border px-3 py-2">
+            <button onclick="editUser(${index})" class="text-blue-600 hover:underline mr-2">Edit</button>
+            <button onclick="deleteUser(${index})" class="text-red-600 hover:underline">Delete</button>
+          </td>
+        `;
+        userTableBody.appendChild(row);
+      });
+    }
+
+    function deleteUser(index) {
+      const users = JSON.parse(localStorage.getItem("crmUsers")) || [];
+      users.splice(index, 1);
+      localStorage.setItem("crmUsers", JSON.stringify(users));
+      loadUsers();
+    }
+
+    function editUser(index) {
+      const users = JSON.parse(localStorage.getItem("crmUsers")) || [];
+      const user = users[index];
+      nameInput.value = user.name;
+      emailInput.value = user.email;
+      roleSelect.value = user.role;
+      editingIndex = index;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    addUserForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const name = nameInput.value.trim();
+      const email = emailInput.value.trim();
+      const role = roleSelect.value;
+
+      let isValid = true;
+      nameError.classList.add("hidden");
+      emailError.classList.add("hidden");
+      roleError.classList.add("hidden");
+
+      if (!isValidName(name)) {
+        nameError.classList.remove("hidden");
+        isValid = false;
+      }
+
+      if (!isValidEmail(email)) {
+        emailError.classList.remove("hidden");
+        isValid = false;
+      }
+
+      if (!role) {
+        roleError.classList.remove("hidden");
+        isValid = false;
+      }
+
+      if (!isValid) return;
+
+      const newUser = { name, email, role };
+      const users = JSON.parse(localStorage.getItem("crmUsers")) || [];
+
+      if (editingIndex >= 0) {
+        users[editingIndex] = newUser;
+        editingIndex = -1;
+      } else {
+        users.push(newUser);
+      }
+
+      localStorage.setItem("crmUsers", JSON.stringify(users));
+      loadUsers();
+      addUserForm.reset();
+    });
+
+    document.addEventListener("DOMContentLoaded", loadUsers);
+</script>
+
+</body>
+</html>

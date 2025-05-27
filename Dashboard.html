@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRM Dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box; /* Prevents unwanted overflow */
+    }
+
+    body {
+        font-family: serif;
+        background: #f0f2f5;
+    }
+
+    /* Header */
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+        padding: 15px 20px;
+        color: black;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 99vw; /*if 100vw, Ensures full viewport width */
+        z-index: 1000;
+        border: 3px; /* Add a 2px blue border */
+    }
+
+    .header {
+        box-shadow: 0 8px 0 0 linear-gradient(135deg, #1e3c72, #2a5298);; /* Add a white bottom shadow */
+        font-family: serif;
+    }
+
+    .header .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .header .logo img {
+        width: 150px;
+    }
+
+    .menu-icon {
+        font-size: 24px;
+        cursor: pointer;
+        margin-left: 30px;
+    }
+
+    /* Enhanced Search Bar */
+    .search-bar {
+        position: relative;
+        display: flex;
+        align-items: center;
+        background: white;
+        border-radius: 25px;
+        padding: 10px 15px;
+        width: 400px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        margin-left: 100px;
+        height: 6vh;
+    }
+
+    .search-bar:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .search-bar input {
+        border: none;
+        outline: none;
+        padding: 25px;
+        width: 100%;
+        border-radius: 25px;
+        background: transparent;
+        font-size: 16px;
+    }
+
+    .search-bar i {
+        color: black;
+        font-size: 20px;
+        position: absolute;
+        right: 10px;
+    }
+
+
+    .language-selector {
+        position: relative;
+        display: inline-block;
+        margin-left: auto;
+        right: 50px;
+        font-family: serif;
+    }
+
+    .language-button {
+        background: white;
+        border-radius: 25px;
+        border: solid grey;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        padding: 8px 12px;
+    }
+
+    .language-button i {
+        margin-right: 10px;
+        color: black;
+        font-size: 20px;
+    }
+
+    .language-dropdown {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 120px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .language-dropdown li a {
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+    }
+
+    .language-dropdown li a:hover {
+        background-color: #f1f1f1;
+    }
+
+    .language-selector:hover .language-dropdown {
+        display: block;
+    }
+
+    .notification {
+        position: relative;
+    }
+
+    .notification .badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: red;
+        color: white;
+        font-size: 12px;
+        width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        display: none;
+    }
+
+    .notification-box {
+        display: none;
+        position: absolute;
+        top: 30px;
+        right: 0;
+        background: white;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 10px;
+        border-radius: 5px;
+        width: 200px;
+        text-align: center;
+    }
+
+
+    .header .icons {
+        display: flex;
+        align-items: center;
+        font-size: 20px;
+    }
+
+    .header .icons i {
+        cursor: pointer;
+        color: black;
+        margin-right: 50px;
+    }
+
+    .header .profile {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .header .profile img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 2px solid white;
+    }
+
+    .icons .profile .user {
+        color: black;
+    }
+
+        /* Updated Sidebar */
+    .sidebar {
+        width: 250px;
+        height: calc(100vh - 70px);
+        background: white;
+        color: white;
+        position: fixed;
+        top: 100px;
+        left: -250px;
+        padding: 20px;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+        transition: left 0.3s ease-in-out;
+        overflow-y: auto;
+    }
+
+    .sidebar ul li {
+        background-color: #6360b1;
+        font-family: serif;
+    }
+
+    .sidebar.open {
+        left: 0;
+    }
+
+    .sidebar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .sidebar ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .sidebar ul li {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 12px;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: all 0.3s;
+        font-weight: bold;
+        border-radius: 10px;
+        margin-bottom: 15px;
+    }
+
+    .sidebar ul li i {
+        width: 20px;
+        color: white;
+    }
+
+    .sidebar ul li:hover {
+        background: blue;
+        padding-left: 20px;
+    }
+
+    .sidebar ul li:active {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .sidebar {
+        box-shadow: 0 8px 0 0 linear-gradient(135deg, #1e3c72, #2a5298);; /* Add a white bottom shadow */
+    }
+
+    /* Main Content */
+    .main-content {
+        margin-left: 0px;
+        margin-top: 100px;
+        padding: 20px;
+        background: white;
+        min-height: calc(100vh - 70px);
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        transition: margin-left 0.3s ease-in-out;
+    }
+
+    .main-content.shift {
+        margin-left: 250px;
+    }
+
+    /* Cards */
+    .cards {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .cardWelcome {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        height: 15vh;
+        text-align: left;
+        color: white;
+        background: linear-gradient(19deg, #B721FF 0%, #21D4FD 100%);
+    }
+
+    .cardRevenue {
+        background: rgb(245, 242, 242);;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        width: 21%;
+        height: 25vh;
+        text-align: left;
+        border: 2px; /* Add a 2px blue border */
+    }
+
+    .card {
+        background: rgb(245, 242, 242);;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        width: 21%;
+        height: 25vh;
+        text-align: left;
+        border: 2px; /* Add a 2px blue border */
+    }
+
+    .card {
+        border-bottom: 3px solid #4caf50; /* Add a 3px dashed green bottom border */
+    }
+
+    .card {
+        box-shadow: 0 5px 0 0 rgba(0, 0, 255, 0.3); /* Add a blue bottom shadow */
+    }
+
+    .cardRevenue {
+        border-bottom: 3px solid #4caf50; /* Add a 3px dashed green bottom border */
+    }
+
+    .cardRevenue {
+        box-shadow: 0 5px 0 0 rgba(0, 0, 255, 0.3); /* Add a blue bottom shadow */
+    }
+
+      .profile {
+      position: relative;
+      cursor: pointer;
+  }
+
+  .profile .user-dropdown {
+      display: none;
+      position: absolute;
+      top: 60px;
+      right: 0;
+      background: white;
+      box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+      list-style: none;
+      margin: 0;
+      padding: 10px 0;
+      border-radius: 8px;
+      width: 150px;
+      z-index: 1001;
+  }
+
+  .profile .user-dropdown li {
+      padding: 10px 15px;
+  }
+
+  .profile .user-dropdown li:hover {
+      background-color: #f1f1f1;
+  }
+
+  .profile .user-dropdown a {
+      text-decoration: none;
+      color: black;
+      display: block;
+  }
+
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .sidebar {
+            width: 100px;
+        }
+
+        .main-content {
+            margin-left: 100px;
+        }
+
+        .card {
+            width: 100%;
+        }
+
+        .header .search-bar input {
+            width: 150px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .sidebar {
+            width: 80px;
+            padding: 10px;
+        }
+
+        .main-content {
+            margin-left: 80px;
+        }
+
+        .header .search-bar input {
+            display: none;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .menu-icon {
+            display: block;
+        }
+    }
+
+        /* Style the iframe */
+        main-content.shift {
+        margin-left: 0;
+    }
+
+/* Adjust iframe styles when sidebar is closed */
+  iframe {
+      width: 80%;           /* Default width */
+      height: 600px;        /* Default height */
+      margin-top: 60px;     /* Space above the iframe */
+      margin-left: 250px;   /* Space left for sidebar */
+      outline: none;
+      transition: all 0.3s ease-in-out; /* Smooth transition */
+  }
+
+  /* Fullscreen iframe styles when sidebar is hidden */
+  iframe.fullscreen {
+      width: 100vw;
+      height: 100vh;
+      margin-left: 0;
+      margin-top: 0;         /* Remove any space on top */
+  }
+
+</style>
+</head>
+<body>
+<div class="header">
+    <div class="logo">
+        <img src="Ats logo.png" alt="Company Logo">
+        <i class="fas fa-bars menu-icon" onclick="toggleSidebar()"></i>
+    </div>
+    <div class="search-bar">
+        <input type="text" placeholder="Search...">
+        <i class="fas fa-search"></i>
+    </div>
+    <div class="language-selector">
+        <button class="language-button">
+            <i class="fas fa-globe"></i><span>English</span>
+        </button>
+        <ul class="language-dropdown">
+            <li><a href="#" data-lang="en">English</a></li>
+            <li><a href="#" data-lang="es">Hindi</a></li>
+            <li><a href="#" data-lang="fr">Kannada</a></li>
+        </ul>
+    </div>
+    <div class="icons">
+        <div class="notification">
+            <i class="fas fa-bell" onclick="toggleNotificationBox()"></i>
+            <span class="badge" id="notification-badge">0</span>
+            <div class="notification-box" id="notification-box">No new notifications</div>
+        </div>
+        <div class="profile" onclick="toggleUserDropdown()">
+          <img src="Bruce Wayne.jfif" alt="Profile Picture">
+          <span class="user">Bruce Wayne</span>
+          <i class="fas fa-caret-down"></i>
+          <ul class="user-dropdown" id="user-dropdown">
+              <li><a href="Profile.html">My Profile</a></li>
+              <li><a href="#">Settings</a></li>
+              <li><a href="#">Logout</a></li>
+          </ul>
+      </div>
+      
+    </div>
+</div>
+
+<div class="sidebar" id="sidebar">
+    <ul>
+        <li onclick="showIframeDashboard()"><i class="fas fa-tachometer-alt"></i>Dashboard</li>
+        <li onclick="showIframeFarmers()"><i class="fas fa-users"></i> Farmers & Suppliers</li>
+        <li onclick="showIframecollection()"><i class="fas fa-warehouse"></i>Milk Collection</li>
+        <li onclick="showIframeLogistics()"><i class="fas fa-truck"></i> Logistics & Distribution</li>
+        <li onclick="showIframePrunit()"><i class="fas fa-industry"></i> Processing Units</li>
+        <li onclick="showIframeSales()"><i class="fas fa-store"></i> Sales & Retailers</li>
+        <li onclick="showIframeInventory()"><i class="fas fa-boxes"></i> Inventory</li>
+        <li onclick="showIframeWorkforce()"><i class="fas fa-user-tie"></i>Workforce Management</li>
+        <li onclick="showIframePayments()"><i class="fas fa-money-bill"></i>Payments & Bills</li>
+        <li onclick="showiframesreviews()"><i class="fas fa-star"></i>Review</li>
+        <li onclick="showIframeMessage()"><i class="fas fa-envelope"></i>Message</li>
+        <li onclick="showIframeProfile()"><i class="fas fa-user"></i>My Profile</li>
+        <li onclick="showIframeSettings()"><i class="fas fa-cogs"></i>Settings</li>
+        <li onclick="showIframeContact()"><i class="fas fa-phone"></i>Contact Us</li>
+        <li onclick=""><i class="fas fa-sign-out-alt"></i>Logout</li>
+    </ul>
+</div>
+
+    <!-- Container that will hold the iframe, hidden by default -->
+    <div id="iframe-dashboard" style="display: none;">
+        <iframe src="Dashboard1.html"></iframe>
+    </div>
+    
+    <div id="iframe-Prunit" style="display: none;">
+        <iframe src="Processing Units.html"></iframe>
+    </div>
+    
+    <div id="iframe-sales" style="display: none;">
+        <iframe src="Sales.html"></iframe>
+    </div>
+
+    <div id="iframe-collection" style="display: none;">
+        <iframe src="collection.html"></iframe>
+    </div>
+
+    <div id="iframe-Farmers" style="display: none;">
+        <iframe src="Farmers.html"></iframe>
+    </div>
+
+    <div id="iframe-Logistics" style="display: none;">
+        <iframe src="Logistics.html"></iframe>
+    </div>
+
+    <div id="iframe-Workforce" style="display: none;">
+        <iframe src="Workforce.html"></iframe>
+    </div>
+
+    <div id="iframe-Payments" style="display: none;">
+        <iframe src="Payments.html"></iframe>
+    </div>
+
+    <div id="iframe-Profile" style="display: none;">
+        <iframe src="Profile.html"></iframe>
+    </div>
+
+    <div id="iframe-reviews" style="display: none;">
+        <iframe src="reviews.html"></iframe>
+    </div>
+
+    <div id="iframe-Message" style="display: none;">
+        <iframe src="Message.html"></iframe>
+    </div>
+
+    <div id="iframe-Settings" style="display: none;">
+        <iframe src="Settings.html"></iframe>
+    </div>
+
+    <div id="iframe-Contact" style="display: none;">
+        <iframe src="Contact.html"></iframe>
+    </div>
+
+    <div id="iframe-Inventory" style="display: none;">
+        <iframe src="Inventory.html"></iframe>
+    </div>
+
+<div class="main-content" id="main-content">
+    <div class="cards">
+        <div class="cardWelcome">
+            <h1>Welcome To Admin Dashboard</h1><br>
+            <p>Here's Summary of your current Sales and Revenues</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">
+                <img src="icons8-farmer-32.png">  
+            </div>
+            <h3>Farmers</h3><br>
+            <p>1250</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">
+                <img src="icons8-store-32.png">
+            </div>
+            <h3>Centers</h3><br>
+            <p>15</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">
+                <img src="icons8-factory-32.png">
+            </div>
+            <h3>Processing Plants</h3><br>
+            <p>5</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">
+                <img src="icons8-summer-sales-32.png">
+            </div>
+            <h3>Sales</h3><br>
+            <p>₹8.2 Crores</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">
+                <img src="icons8-test-tube-32.png" >
+            </div>
+            <h3>Test Conducted</h3><br>
+            <p>3500</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">
+                <img src="icons8-fast-moving-consumer-goods-32.png">
+            </div>
+            <h3>Milk Products(L)</h3><br>
+            <p>3000</p>
+        </div>
+        <div class="cardRevenue">
+            <div class="card-icon">
+                <img src="icons8-revenue-32.png">
+            </div>
+            <div class="card-content">
+                <h3>Total Revenue</h3>
+                <p>₹4.8 Crores </p>
+                <p class="description"><span class="percentage">↑ 0.8%</span>Than last Month</p>
+            </div>
+            <div class="chart-container">
+                <canvas id="myChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+      function toggleSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      const mainContent = document.getElementById("main-content");
+      const iframes = document.querySelectorAll("iframe"); // Select all iframe elements
+
+      sidebar.classList.toggle("open");
+      mainContent.classList.toggle("shift");
+
+      // If sidebar is hidden, make iframe full screen
+      if (sidebar.classList.contains("open")) {
+          // Restore the iframe to normal view when sidebar is open
+          iframes.forEach(iframe => {
+              iframe.style.marginLeft = "250px";  // Normal margin for iframe
+              iframe.style.width = "80%";         // Normal width for iframe
+              iframe.style.height = "600px";      // Normal height for iframe
+          });
+      } else {
+          // Make iframe take full screen when sidebar is closed
+          iframes.forEach(iframe => {
+              iframe.style.marginLeft = "0";      // Remove margin for full screen
+              iframe.style.width = "100vw";       // Full width of the viewport
+              iframe.style.height = "100vh";      // Full height of the viewport
+          });
+      }
+  }
+
+
+    // JavaScript function to show the iframe
+        // Show dashboard iframe and hide others
+
+        function hideAllSections() {
+            document.getElementById('iframe-dashboard').style.display = 'none';
+            document.getElementById('iframe-Prunit').style.display = 'none';
+            document.getElementById('iframe-sales').style.display = 'none';
+            document.getElementById('iframe-collection').style.display = 'none';
+            document.getElementById('main-content').style.display = 'none';
+            document.getElementById('iframe-Farmers').style.display='none';
+            document.getElementById('iframe-Logistics').style.display='none';
+            document.getElementById('iframe-Workforce').style.display='none';
+            document.getElementById('iframe-Payments').style.display='none';
+            document.getElementById('iframe-Profile').style.display='none';
+            document.getElementById('iframe-reviews').style.display='none';
+            document.getElementById('iframe-Message').style.display='none';
+            document.getElementById('iframe-Settings').style.display='none';
+            document.getElementById('iframe-Contact').style.display='none';
+            document.getElementById('iframe-Inventory').style.display='none';
+        }
+
+        function showIframeDashboard() {
+            hideAllSections();
+            document.getElementById('iframe-dashboard').style.display = 'block';
+        }
+
+        function showIframePrunit() {
+            hideAllSections();
+            document.getElementById('iframe-Prunit').style.display = 'block';
+        }
+
+        function showIframeSales() {
+            hideAllSections();
+            document.getElementById('iframe-sales').style.display = 'block';
+        }
+
+        function showIframecollection() {
+            hideAllSections();
+            document.getElementById('iframe-collection').style.display = 'block';
+        }
+        
+        function showIframeFarmers() {
+            hideAllSections();
+            document.getElementById('iframe-Farmers').style.display = 'block';
+        }
+
+        function showIframeLogistics() {
+            hideAllSections();
+            document.getElementById('iframe-Logistics').style.display = 'block';
+        }
+
+        function showIframeWorkforce() {
+            hideAllSections();
+            document.getElementById('iframe-Workforce').style.display = 'block';
+        }
+
+        function showIframePayments() {
+            hideAllSections();
+            document.getElementById('iframe-Payments').style.display = 'block';
+        }
+
+        function showIframeProfile() {
+            hideAllSections();
+            document.getElementById('iframe-Profile').style.display = 'block';
+        }
+
+        function showiframesreviews() {
+            hideAllSections();
+            document.getElementById('iframe-reviews').style.display = 'block';
+        }
+
+        function showIframeMessage() {
+            hideAllSections();
+            document.getElementById('iframe-Message').style.display = 'block';
+        }
+
+        function showIframeSettings() {
+            hideAllSections();
+            document.getElementById('iframe-Settings').style.display = 'block';
+        }
+
+        function showIframeContact() {
+            hideAllSections();
+            document.getElementById('iframe-Contact').style.display = 'block';
+        }
+
+        function showIframeInventory() {
+            hideAllSections();
+            document.getElementById('iframe-Inventory').style.display = 'block';
+        }
+
+        
+      function toggleUserDropdown() {
+          const dropdown = document.getElementById("user-dropdown");
+          dropdown.style.display = (dropdown.style.display === "block") ? "none" : "block";
+      }
+
+      // Close dropdown when clicking outside
+      document.addEventListener("click", function(event) {
+          const profile = document.querySelector(".profile");
+          const dropdown = document.getElementById("user-dropdown");
+          if (!profile.contains(event.target)) {
+              dropdown.style.display = "none";
+          }
+      });
+
+
+</script>
+</body>
+</html>

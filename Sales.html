@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Data - Dairy CRM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: white;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        header {
+            background-color: #21D4FD;
+            background-image: linear-gradient(19deg, #21D4FD 0%, #B721FF 100%);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 20px;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        .search-wrapper, .filter-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .search-container {
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 20px;
+            padding: 5px 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+            height: 25px;
+        }
+        .search-input {
+            border: none;
+            outline: none;
+            font-size: 16px;
+            padding: 8px;
+            border-radius: 20px;
+            width: 250px;
+            padding-right: 30px;
+        }
+        .search-container i {
+            font-size: 18px;
+            color: black;
+            position: absolute;
+            right: 10px;
+            cursor: pointer;
+        }
+        .add-btn, .export-btn {
+            background-color: green;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            margin-left: 10px;
+        }
+        .filter-select {
+            padding: 6px;
+            font-size: 14px;
+            border-radius: 10px;
+        }
+        form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        form input, form select {
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        form button {
+            padding: 8px 12px;
+            background-color: #2575fc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th { 
+            background-color: #67b2e7;
+            background-image: linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%);
+            color: white;
+        }
+        .action-btns button {
+            margin-right: 5px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .edit-btn { background-color: #f0ad4e; color: white; }
+        .delete-btn { background-color: #d9534f; color: white; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Sales Data</h1>
+    </header>
+
+    <div class="search-wrapper">
+        <div class="search-container">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search...">
+            <i class="fas fa-search"></i>
+        </div>
+        <div>
+            <select id="statusFilter" class="filter-select">
+                <option value="">All Statuses</option>
+                <option value="Completed">Completed</option>
+                <option value="Pending">Pending</option>
+            </select>
+            <button class="add-btn" onclick="showForm()">Add New Sale</button>
+            <button class="export-btn" onclick="exportToExcel()">Export to Excel</button>
+        </div>
+    </div>
+
+    <form id="saleForm" style="display:none">
+        <input type="text" id="client" placeholder="Client Name" required>
+        <input type="text" id="product" placeholder="Product" required>
+        <input type="text" id="quantity" placeholder="Quantity" required>
+        <input type="text" id="amount" placeholder="Amount" required>
+        <input type="date" id="date" required>
+        <select id="status">
+            <option value="Completed">Completed</option>
+            <option value="Pending">Pending</option>
+        </select>
+        <button type="submit">Save</button>
+    </form>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Client Name</th>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Amount</th>
+            <th>Date</th>
+            <th>Payment Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="salesTableBody"></tbody>
+    </table>
+</div>
+
+<script>
+    const form = document.getElementById("saleForm");
+    const salesTableBody = document.getElementById("salesTableBody");
+    const searchInput = document.getElementById("searchInput");
+    const statusFilter = document.getElementById("statusFilter");
+    let editIndex = -1;
+
+    function showForm() {
+        form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+        form.reset();
+        editIndex = -1;
+    }
+
+    function getSalesData() {
+        return JSON.parse(localStorage.getItem("salesData")) || [];
+    }
+
+    function setSalesData(data) {
+        localStorage.setItem("salesData", JSON.stringify(data));
+    }
+
+    function renderTable() {
+        const data = getSalesData();
+        const searchText = searchInput.value.toLowerCase();
+        const status = statusFilter.value;
+
+        salesTableBody.innerHTML = "";
+        data.forEach((sale, index) => {
+            if ((sale.client.toLowerCase().includes(searchText) || sale.product.toLowerCase().includes(searchText)) && 
+                (status === "" || sale.status === status)) {
+                const row = `<tr>
+                    <td>${sale.client}</td>
+                    <td>${sale.product}</td>
+                    <td>${sale.quantity}</td>
+                    <td>${sale.amount}</td>
+                    <td>${sale.date}</td>
+                    <td>${sale.status}</td>
+                    <td class="action-btns">
+                        <button class="edit-btn" onclick="editSale(${index})">Edit</button>
+                        <button class="delete-btn" onclick="deleteSale(${index})">Delete</button>
+                    </td>
+                </tr>`;
+                salesTableBody.innerHTML += row;
+            }
+        });
+    }
+
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const newSale = {
+            client: document.getElementById("client").value,
+            product: document.getElementById("product").value,
+            quantity: document.getElementById("quantity").value,
+            amount: document.getElementById("amount").value,
+            date: document.getElementById("date").value,
+            status: document.getElementById("status").value
+        };
+
+        const data = getSalesData();
+        if (editIndex > -1) {
+            data[editIndex] = newSale;
+        } else {
+            data.push(newSale);
+        }
+        setSalesData(data);
+        renderTable();
+        form.reset();
+        form.style.display = 'none';
+        editIndex = -1;
+    });
+
+    function editSale(index) {
+        const sale = getSalesData()[index];
+        document.getElementById("client").value = sale.client;
+        document.getElementById("product").value = sale.product;
+        document.getElementById("quantity").value = sale.quantity;
+        document.getElementById("amount").value = sale.amount;
+        document.getElementById("date").value = sale.date;
+        document.getElementById("status").value = sale.status;
+        form.style.display = 'flex';
+        editIndex = index;
+    }
+
+    function deleteSale(index) {
+        const data = getSalesData();
+        data.splice(index, 1);
+        setSalesData(data);
+        renderTable();
+    }
+
+    function exportToExcel() {
+        const ws = XLSX.utils.json_to_sheet(getSalesData());
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Sales");
+        XLSX.writeFile(wb, "SalesData.xlsx");
+    }
+
+    searchInput.addEventListener("input", renderTable);
+    statusFilter.addEventListener("change", renderTable);
+    document.addEventListener("DOMContentLoaded", renderTable);
+</script>
+</body>
+</html>

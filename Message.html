@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dairy CRM - Message Module</title>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to bottom, #ebf8ff, #ffffff);
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      animation: fadeInBody 0.8s ease-in;
+    }
+
+    @keyframes fadeInBody {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #1e3a8a;
+      text-align: center;
+      margin-bottom: 2rem;
+      animation: popIn 0.6s ease-in-out;
+      margin: 50px 0;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .tab-button {
+      padding: 0.5rem 1.5rem;
+      border-radius: 0.5rem;
+      border: none;
+      background-color: #e5e7eb;
+      color: #374151;
+      font-weight: 600;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .tab-button:hover {
+      background-color: #cbd5e1;
+      transform: scale(1.05);
+    }
+
+    .tab-button.active {
+      background-color: #3b82f6;
+      color: #fff;
+      transform: scale(1.05);
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section {
+      max-width: 900px;
+      margin: auto;
+      background: #ffffff;
+      padding: 1.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+    }
+
+    .section h2 {
+      color: #1d4ed8;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      padding: 1rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+      background-color: #f9fafb;
+      transition: transform 0.2s;
+    }
+
+    li:hover {
+      transform: translateX(5px);
+      background-color: #f1f5f9;
+    }
+
+    form input,
+    form textarea,
+    form button {
+      width: 100%;
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+    }
+
+    form button {
+      background-color: #10b981;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    form button:hover {
+      background-color: #059669;
+      transform: scale(1.02);
+    }
+
+    .text-red { color: #dc2626; }
+    .text-yellow { color: #f59e0b; }
+    .text-green { color: #16a34a; }
+  </style>
+</head>
+<body>
+  <h1>📩 Message Center</h1>
+
+  <div class="tabs">
+    <button class="tab-button active" data-tab="inbox">📥 Inbox</button>
+    <button class="tab-button" data-tab="sent">📤 Sent</button>
+    <button class="tab-button" data-tab="compose">✍️ Compose</button>
+    <button class="tab-button" data-tab="alerts">⚠️ Alerts</button>
+  </div>
+
+  <div id="inbox" class="tab-content active section">
+    <h2>Inbox</h2>
+    <ul id="inbox-list"></ul>
+  </div>
+
+  <div id="sent" class="tab-content section">
+    <h2>Sent Messages</h2>
+    <ul id="sent-list"></ul>
+  </div>
+
+  <div id="compose" class="tab-content section">
+    <h2>Compose New Message</h2>
+    <form id="messageForm">
+      <input type="text" id="recipient" placeholder="Recipient (e.g., Sales Team)" required />
+      <input type="text" id="subject" placeholder="Subject" required />
+      <textarea id="body" rows="5" placeholder="Message content..." required></textarea>
+      <input type="file" id="attachment" />
+      <button type="submit">Send</button>
+    </form>
+  </div>
+
+  <div id="alerts" class="tab-content section">
+    <h2>Automated System Alerts</h2>
+    <ul>
+      <li class="text-red">🕒 Payment Due Alert: Vendor #102 - ₹50,000</li>
+      <li class="text-yellow">⚠️ Low Inventory Warning: Butter Stock</li>
+      <li class="text-green">📅 Milk Collection Schedule: Updated for Tomorrow</li>
+    </ul>
+  </div>
+
+  <script>
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const inboxList = document.getElementById('inbox-list');
+    const sentList = document.getElementById('sent-list');
+    const messageForm = document.getElementById('messageForm');
+
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const target = button.getAttribute('data-tab');
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        tabContents.forEach(tab => {
+          tab.classList.remove('active');
+          if (tab.id === target) tab.classList.add('active');
+        });
+      });
+    });
+
+    messageForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const recipient = document.getElementById('recipient').value;
+      const subject = document.getElementById('subject').value;
+      const body = document.getElementById('body').value;
+
+      const newMessage = `<li><strong>To:</strong> ${recipient} <br><strong>Subject:</strong> ${subject}<br>${body}</li>`;
+      sentList.innerHTML += newMessage;
+
+      document.getElementById('recipient').value = '';
+      document.getElementById('subject').value = '';
+      document.getElementById('body').value = '';
+    });
+
+    inboxList.innerHTML = `
+      <li><strong>From:</strong> Logistics Dept<br><strong>Subject:</strong> Delivery Delayed<br>Please note a delay in Route 3 due to roadblocks.</li>
+      <li><strong>From:</strong> Farmer Union<br><strong>Subject:</strong> Rate Negotiation<br>Requesting a meeting for revised milk pricing.</li>
+    `;
+  </script>
+</body>
+</html>

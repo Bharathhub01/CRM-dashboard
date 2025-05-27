@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inventory Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-gray-100 font-sans pt-6">
+  <div class="min-h-screen p-6">
+    <h1 class="text-3xl font-bold mb-6 text-green-800">Inventory Management</h1>
+
+    <!-- Total Products Card -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white p-6 rounded-xl shadow text-center">
+        <p class="text-lg font-semibold text-gray-600">Total Inventory Items</p>
+        <p id="totalCount" class="text-3xl font-bold text-green-700 mt-2">0</p>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="flex flex-wrap gap-4 mb-6">
+      <button onclick="filterBy('all')" class="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded">All</button>
+      <button onclick="filterBy('expiring')" class="bg-red-300 hover:bg-red-400 px-4 py-2 rounded">Expiring Soon</button>
+      <button onclick="filterBy('low')" class="bg-yellow-300 hover:bg-yellow-400 px-4 py-2 rounded">Low Stock</button>
+      <select id="filterProduct" onchange="renderTable()" class="p-2 border rounded">
+        <option value="">All Products</option>
+      </select>
+    </div>
+
+    <!-- Add/Edit Inventory Form -->
+    <div class="bg-white p-6 rounded-xl shadow mb-6">
+      <h2 class="text-xl font-semibold mb-4" id="formTitle">Add Inventory</h2>
+      <form id="inventoryForm" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <select id="product" class="p-2 border rounded" required></select>
+        <input type="text" placeholder="Batch Number" id="batch" class="p-2 border rounded" required>
+        <div class="flex gap-2 items-center">
+          <input type="number" placeholder="Quantity" id="quantity" class="p-2 border rounded w-full" required>
+          <span id="unit" class="text-gray-700 font-medium"></span>
+        </div>
+        <input type="date" id="expiry" class="p-2 border rounded" required>
+        <input type="hidden" id="editIndex">
+        <button type="submit" class="col-span-1 sm:col-span-2 md:col-span-4 bg-green-600 text-white py-2 rounded hover:bg-green-700">Save Item</button>
+      </form>
+    </div>
+
+    <!-- Inventory Table and Controls -->
+    <div class="bg-white p-6 rounded-xl shadow mb-6">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold">Inventory List</h2>
+        <div class="flex gap-2">
+          <button onclick="exportToExcel()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Export to Excel</button>
+          <button onclick="exportToPDF()" class="bg-pink-600 text-white px-4 py-2 rounded hover:bg-pink-700">Export to PDF</button>
+        </div>
+      </div>
+      <input type="text" placeholder="Search by product or batch..." id="search" class="mb-4 p-2 border rounded w-full">
+      <div class="overflow-x-auto">
+        <table class="min-w-full table-auto text-left">
+          <thead>
+            <tr class="bg-gray-200 text-gray-700 cursor-pointer">
+              <th class="p-2" onclick="sortTable('product')">Product</th>
+              <th class="p-2" onclick="sortTable('batch')">Batch</th>
+              <th class="p-2" onclick="sortTable('quantity')">Quantity</th>
+              <th class="p-2" onclick="sortTable('expiry')">Expiry</th>
+              <th class="p-2">Status</th>
+              <th class="p-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="inventoryTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-white p-6 rounded-xl shadow">
+        <canvas id="barChart"></canvas>
+      </div>
+      <div class="bg-white p-6 rounded-xl shadow">
+        <canvas id="pieChart"></canvas>
+      </div>
+    </div>
+
+<script>
+const products = {
+  'Milk': 'L', 'UHT Milk': 'L', 'Curd': 'Kg', 'Buttermilk': 'L',
+  'Ice Cream': 'L', 'Lassi': 'L', 'Flavoured Milk': 'L', 'Sweets': 'Kg',
+  'Paneer': 'Kg', 'Ghee': 'L'
+};
+
+let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+const tableBody = document.getElementById('inventoryTable');
+const productSelect = document.getElementById('product');
+const unitSpan = document.getElementById('unit');
+const search = document.getElementById('search');
+const form = document.getElementById('inventoryForm');
+const filterProduct = document.getElementById('filterProduct');
+const totalCount = document.getElementById('totalCount');
+
+Object.keys(products).forEach(p => {
+  const option = new Option(p, p);
+  productSelect.appendChild(option);
+  filterProduct.appendChild(option.cloneNode(true));
+});
+
+productSelect.addEventListener('change', () => unitSpan.textContent = products[productSelect.value]);
+unitSpan.textContent = products[productSelect.value];
+
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  const data = {
+    product: productSelect.value,
+    batch: document.getElementById('batch').value,
+    quantity: parseFloat(document.getElementById('quantity').value),
+    expiry: document.getElementById('expiry').value
+  };
+  const editIndex = document.getElementById('editIndex').value;
+  if (editIndex !== '') inventory[+editIndex] = data;
+  else inventory.push(data);
+  saveInventory();
+  form.reset();
+  productSelect.selectedIndex = 0;
+  document.getElementById('editIndex').value = '';
+  unitSpan.textContent = products[productSelect.value];
+  renderTable();
+});
+
+search.addEventListener('input', renderTable);
+
+function saveInventory() {
+  localStorage.setItem('inventory', JSON.stringify(inventory));
+}
+
+function renderTable() {
+  const filter = search.value.toLowerCase();
+  const filterType = document.querySelector('button.bg-red-400, button.bg-yellow-400')?.textContent || 'All';
+  const selectedProduct = filterProduct.value;
+  tableBody.innerHTML = '';
+  let count = 0;
+  inventory.forEach((item, index) => {
+    const expiryDate = new Date(item.expiry);
+    const daysToExpire = (expiryDate - new Date()) / (1000 * 60 * 60 * 24);
+    const isExpiring = daysToExpire < 7;
+    const isLowStock = item.quantity < 50;
+    if (
+      (item.product.toLowerCase().includes(filter) || item.batch.toLowerCase().includes(filter)) &&
+      (selectedProduct === '' || item.product === selectedProduct) &&
+      (filterType === 'All' || (filterType === 'Expiring Soon' && isExpiring) || (filterType === 'Low Stock' && isLowStock))
+    ) {
+      count++;
+      const status = isExpiring ? 'Expiring Soon' : 'OK';
+      const statusColor = isExpiring ? 'text-red-600' : 'text-green-600';
+      tableBody.innerHTML += `
+        <tr class="border-b">
+          <td class="p-2">${item.product}</td>
+          <td class="p-2">${item.batch}</td>
+          <td class="p-2">${item.quantity} ${products[item.product]}</td>
+          <td class="p-2">${item.expiry}</td>
+          <td class="p-2 font-semibold ${statusColor}">${status}</td>
+          <td class="p-2 flex gap-2">
+            <button onclick="editItem(${index})" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">Edit</button>
+            <button onclick="deleteItem(${index})" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">Delete</button>
+          </td>
+
+        </tr>`;
+    }
+  });
+  totalCount.textContent = count;
+  updateCharts();
+}
+
+function editItem(index) {
+  const item = inventory[index];
+  productSelect.value = item.product;
+  document.getElementById('batch').value = item.batch;
+  document.getElementById('quantity').value = item.quantity;
+  document.getElementById('expiry').value = item.expiry;
+  document.getElementById('editIndex').value = index;
+  unitSpan.textContent = products[productSelect.value];
+  document.getElementById('formTitle').textContent = 'Edit Inventory';
+}
+
+function deleteItem(index) {
+  lastDeleted = { item: inventory[index], index };
+  inventory.splice(index, 1);
+  saveInventory();
+  renderTable();
+}
+
+function filterBy(type) {
+  document.querySelectorAll('button').forEach(btn => btn.classList.remove('bg-red-400', 'bg-yellow-400'));
+  if (type === 'expiring') event.target.classList.add('bg-red-400');
+  if (type === 'low') event.target.classList.add('bg-yellow-400');
+  renderTable();
+}
+
+function sortTable(key) {
+  inventory.sort((a, b) => {
+    let valA = typeof a[key] === 'string' ? a[key].toLowerCase() : a[key];
+    let valB = typeof b[key] === 'string' ? b[key].toLowerCase() : b[key];
+    return valA > valB ? 1 : -1;
+  });
+  renderTable();
+}
+
+function exportToExcel() {
+  const ws = XLSX.utils.json_to_sheet(inventory);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Inventory');
+  XLSX.writeFile(wb, 'inventory.xlsx');
+}
+
+function exportToPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  let y = 10;
+  doc.setFontSize(14);
+  doc.text('Inventory List', 10, y);
+  y += 10;
+  inventory.forEach(item => {
+    doc.text(`${item.product} | ${item.batch} | ${item.quantity}${products[item.product]} | Exp: ${item.expiry}`, 10, y);
+    y += 8;
+  });
+  doc.save('inventory.pdf');
+}
+
+let barChart, pieChart;
+function updateCharts() {
+  const totals = {};
+  inventory.forEach(item => {
+    if (!totals[item.product]) totals[item.product] = 0;
+    totals[item.product] += item.quantity;
+  });
+  const labels = Object.keys(totals);
+  const data = Object.values(totals);
+  if (barChart) barChart.destroy();
+  if (pieChart) pieChart.destroy();
+  barChart = new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Stock Quantity',
+        data,
+        backgroundColor: 'rgba(75,192,192,0.6)'
+      }]
+    },
+    options: {
+      scales: {
+        x: { title: { display: true, text: 'Product' } },
+        y: { title: { display: true, text: 'Quantity' } }
+      }
+    }
+  });
+  pieChart = new Chart(document.getElementById('pieChart'), {
+    type: 'pie',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Stock Distribution',
+        data,
+        backgroundColor: ['#FF6384','#36A2EB','#FFCE56','#4BC0C0','#9966FF','#FF9F40','#00A36C','#C71585','#FFD700','#DC143C']
+      }]
+    }
+  });
+}
+
+renderTable();
+</script>
+</body>
+</html>

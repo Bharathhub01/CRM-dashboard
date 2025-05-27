@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Employee Directory</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 30px;
+      background: #f8fafc; /* Light white background */
+      color: #333;
+    }
+  
+    header {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      color: white;
+      padding: 25px 0;
+      text-align: center;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+  
+    h1 {
+      margin: 0;
+      font-size: 2.5rem;
+      font-weight: 700;
+    }
+  
+    h2, h3 {
+      color: #1d4ed8; /* Soft blue */
+      margin-bottom: 15px;
+    }
+  
+    .section {
+      background: #ffffff;
+      padding: 35px;
+      border-radius: 18px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+      max-width: 1200px;
+      margin: auto;
+    }
+  
+    form {
+      margin-bottom: 40px;
+    }
+  
+    .form-field {
+      margin-bottom: 20px;
+    }
+  
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #374151;
+    }
+  
+    input, select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 15px;
+      background-color: #f9fafb;
+      transition: all 0.3s ease;
+    }
+  
+    input:focus, select:focus {
+      border-color: #3b82f6;
+      outline: none;
+      background-color: #ffffff;
+    }
+  
+    .submit-btn {
+      background: linear-gradient(135deg, #4caf50, #81c784);
+      color: white;
+      padding: 14px 30px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 17px;
+      font-weight: 600;
+      transition: background-color 0.4s ease;
+      display: inline-block;
+      margin-top: 10px;
+    }
+  
+    .submit-btn:hover {
+      background: linear-gradient(135deg, #43a047, #66bb6a);
+    }
+  
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-top: 30px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #ffffff;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    }
+  
+    th, td {
+      padding: 15px 18px;
+      text-align: left;
+      font-size: 14px;
+    }
+  
+    th {
+      background-color: #1d4ed8;
+      color: white;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+  
+    tr:nth-child(even) {
+      background-color: #f3f4f6;
+    }
+  
+    tr:hover {
+      background-color: #e0e7ff;
+    }
+  
+    .edit-btn, .delete-btn {
+      border: none;
+      background: none;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 6px 10px;
+      transition: transform 0.2s, color 0.3s;
+    }
+  
+    .edit-btn:hover {
+      color: #1d4ed8;
+      transform: scale(1.2);
+    }
+  
+    .delete-btn:hover {
+      color: #ef4444;
+      transform: scale(1.2);
+    }
+  
+    .form-field select, 
+    .form-field input {
+      background-color: #f1f5f9;
+    }
+  
+    @media (max-width: 768px) {
+      .section {
+        padding: 20px;
+      }
+  
+      form {
+        margin-bottom: 30px;
+      }
+  
+      table {
+        font-size: 13px;
+      }
+  
+      h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+  
+</head>
+<body>
+  <header>
+    <h1>Employee Directory</h1>
+  </header>
+  <div class="section">
+    <form id="employeeForm">
+      <h3>Basic Information</h3>
+      <div class="form-field">
+        <label for="empName">Name</label>
+        <input type="text" id="empName" required />
+      </div>
+      <div class="form-field">
+        <label for="empRole">Role</label>
+        <input type="text" id="empRole" />
+      </div>
+      <div class="form-field">
+        <label for="empDept">Department</label>
+        <input type="text" id="empDept" />
+      </div>
+      <div class="form-field">
+        <label for="empId">Employee ID</label>
+        <input type="text" id="empId" required />
+      </div>
+
+      <h3>Contact Details</h3>
+      <div class="form-field">
+        <label for="empPhone">Phone</label>
+        <input type="text" id="empPhone" />
+      </div>
+      <div class="form-field">
+        <label for="empEmail">Email</label>
+        <input type="email" id="empEmail" />
+      </div>
+      <div class="form-field">
+        <label for="empEmergency">Emergency Contact</label>
+        <input type="text" id="empEmergency" />
+      </div>
+
+      <h3>Work Location</h3>
+      <div class="form-field">
+        <label for="empLocation">Location</label>
+        <select id="empLocation">
+          <option value="Plant">Plant</option>
+          <option value="Office">Office</option>
+          <option value="Field Zone">Field Zone</option>
+        </select>
+      </div>
+
+      <h3>Other Details</h3>
+      <div class="form-field">
+        <label for="empJoinDate">Joining Date</label>
+        <input type="date" id="empJoinDate" />
+      </div>
+      <div class="form-field">
+        <label for="empManager">Manager/Supervisor</label>
+        <input type="text" id="empManager" />
+      </div>
+
+      <button type="submit" class="submit-btn">Save Employee</button>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>ID</th>
+          <th>Role</th>
+          <th>Dept</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Location</th>
+          <th>Joining</th>
+          <th>Manager</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="employeeTableBody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    let employeeList = JSON.parse(localStorage.getItem("employeeList")) || [];
+    const form = document.getElementById("employeeForm");
+    const tbody = document.getElementById("employeeTableBody");
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const newEmp = {
+        name: empName.value,
+        id: empId.value,
+        role: empRole.value,
+        dept: empDept.value,
+        phone: empPhone.value,
+        email: empEmail.value,
+        emergency: empEmergency.value,
+        location: empLocation.value,
+        joinDate: empJoinDate.value,
+        manager: empManager.value,
+      };
+
+      employeeList.push(newEmp);
+      localStorage.setItem("employeeList", JSON.stringify(employeeList));
+      renderTable();
+      form.reset();
+    });
+
+    function renderTable() {
+      tbody.innerHTML = '';
+      employeeList.forEach((emp, index) => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${emp.name}</td>
+            <td>${emp.id}</td>
+            <td>${emp.role}</td>
+            <td>${emp.dept}</td>
+            <td>${emp.phone}</td>
+            <td>${emp.email}</td>
+            <td>${emp.location}</td>
+            <td>${emp.joinDate}</td>
+            <td>${emp.manager}</td>
+            <td>
+              <button onclick="editEmp(${index})" class="edit-btn">✏️</button>
+              <button onclick="deleteEmp(${index})" class="delete-btn">🗑️</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function editEmp(index) {
+      const emp = employeeList[index];
+      empName.value = emp.name;
+      empId.value = emp.id;
+      empRole.value = emp.role;
+      empDept.value = emp.dept;
+      empPhone.value = emp.phone;
+      empEmail.value = emp.email;
+      empEmergency.value = emp.emergency;
+      empLocation.value = emp.location;
+      empJoinDate.value = emp.joinDate;
+      empManager.value = emp.manager;
+
+      employeeList.splice(index, 1);
+      renderTable();
+    }
+
+    function deleteEmp(index) {
+      if (confirm("Are you sure you want to delete this employee?")) {
+        employeeList.splice(index, 1);
+        localStorage.setItem("employeeList", JSON.stringify(employeeList));
+        renderTable();
+      }
+    }
+
+    renderTable();
+  </script>
+</body>
+</html>

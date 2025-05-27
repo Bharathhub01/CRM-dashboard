@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🥛 Fresh Milk Collection Insights 📊</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0f8ff, #e0f2f7);
+            margin: 0;
+            padding: 30px;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header-title {
+            background-color: #21D4FD;
+            background-image: linear-gradient(19deg, #21D4FD 0%, #B721FF 100%);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 20px;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        .card, .data-table {
+            background: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            transition: transform 0.2s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card i {
+            font-size: 36px;
+            color: #28a745;
+            margin-bottom: 12px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        .card h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+            color: #555;
+        }
+        .card p {
+            font-size: 24px;
+            color: #007bff;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        .data-table {
+            grid-column: 1 / -1; /* Make it span the entire width */
+            margin-bottom: 20px;
+        }
+        .data-table h3 {
+            font-size: 22px;
+            color: #333;
+            text-align: left;
+            margin-bottom: 15px;
+        }
+        .data-table table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .data-table th, .data-table td {
+            border-bottom: 1px solid #eee;
+            padding: 12px 15px;
+            text-align: center;
+        }
+        .data-table th {
+            background-color: #bdd8eb;
+            background-image: linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .data-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .filter-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .filter-container label {
+            font-size: 16px;
+            margin-right: 10px;
+            color: #555;
+        }
+        .filter-container select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-right: 15px;
+        }
+        .chart-container {
+            background: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-bottom: 30px;
+        }
+        .chart-container h3 {
+            font-size: 22px;
+            color: #333;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="header-title">🥛 Fresh Milk Collection Insights 📊</h1>
+
+        <div class="filter-container">
+            <label for="state">Filter by State:</label>
+            <select id="state" onchange="filterData()">
+                <option value="all">All States</option>
+                <option value="Andhra Pradesh">Andhra Pradesh</option>
+                <option value="Telangana">Telangana</option>
+                <option value="Karnataka">Karnataka</option>
+                <option value="Tamil Nadu">Tamil Nadu</option>
+                <option value="Maharashtra">Maharashtra</option>
+            </select>
+        </div>
+
+        <div class="dashboard">
+            <div class="card">
+                <i class="fas fa-warehouse"></i>
+                <h3>Milk Collection Centers</h3>
+                <p id="centers">15</p>
+            </div>
+            <div class="card">
+                <i class="fas fa-glass-whiskey"></i>
+                <h3>Total Milk Collected (Liters)</h3>
+                <p id="milkCollected">120,000</p>
+            </div>
+        </div>
+
+        <div class="data-table">
+            <h3>Detailed Milk Collection Data</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>State</th>
+                        <th>Center</th>
+                        <th>Milk Collected (L)</th>
+                        <th>Month</th>
+                    </tr>
+                </thead>
+                <tbody id="tableData">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="chart-container">
+            <h3>Milk Collection Graph</h3><br><br>
+            <canvas id="milkChart"></canvas>
+        </div>
+        <div id="customChartLabel" style="margin-top: 20px; font-weight: 600; color: #28a745; font-size: 18px; text-align: center;">
+            Milk Collected (Liters) - 2024
+        </div>
+        
+    </div>
+
+    <script>
+        const milkData = {
+            "Andhra Pradesh": {
+                centers: 2,
+                milk: 72000,
+                data: [
+                    ["Andhra Pradesh", "Penumur", 5000, "Jan-2024"],
+                    ["Andhra Pradesh", "Kurnool", 7000, "Feb-2024"],
+                    ["Andhra Pradesh", "Chittoor", 6500, "Mar-2024"],
+                    ["Andhra Pradesh", "Kadapa", 6200, "Apr-2024"],
+                    ["Andhra Pradesh", "Tirupati", 5900, "May-2024"],
+                    ["Andhra Pradesh", "Ongole", 6100, "Jun-2024"],
+                    ["Andhra Pradesh", "Nellore", 6300, "Jul-2024"],
+                    ["Andhra Pradesh", "Guntur", 6400, "Aug-2024"],
+                    ["Andhra Pradesh", "Vijayawada", 6600, "Sep-2024"],
+                    ["Andhra Pradesh", "Visakhapatnam", 6800, "Oct-2024"],
+                    ["Andhra Pradesh", "Kakinada", 6700, "Nov-2024"],
+                    ["Andhra Pradesh", "Rajahmundry", 6900, "Dec-2024"]
+                ]
+            },
+            "Telangana": {
+                centers: 2,
+                milk: 80000,
+                data: [
+                    ["Telangana", "Gundrampally", 6000, "Jan-2024"],
+                    ["Telangana", "Karimnagar", 8000, "Feb-2024"],
+                    ["Telangana", "Warangal", 7500, "Mar-2024"],
+                    ["Telangana", "Nalgonda", 7000, "Apr-2024"],
+                    ["Telangana", "Hyderabad", 7200, "May-2024"],
+                    ["Telangana", "Adilabad", 7300, "Jun-2024"],
+                    ["Telangana", "Mahbubnagar", 7100, "Jul-2024"],
+                    ["Telangana", "Khammam", 7400, "Aug-2024"],
+                    ["Telangana", "Suryapet", 7600, "Sep-2024"],
+                    ["Telangana", "Nizamabad", 7700, "Oct-2024"],
+                    ["Telangana", "Mancherial", 7800, "Nov-2024"],
+                    ["Telangana", "Jagityal", 7900, "Dec-2024"]
+                ]
+            }
+        };
+    
+        let milkChart = null;
+    
+        function filterData() {
+            const selectedState = document.getElementById("state").value;
+            let totalCenters = 0;
+            let totalMilk = 0;
+            let allTableData = [];
+    
+            if (selectedState === "all") {
+                for (const state in milkData) {
+                    totalCenters += milkData[state].centers;
+                    totalMilk += milkData[state].milk;
+                    allTableData = allTableData.concat(milkData[state].data);
+                }
+            } else if (milkData[selectedState]) {
+                totalCenters = milkData[selectedState].centers;
+                totalMilk = milkData[selectedState].milk;
+                allTableData = milkData[selectedState].data;
+            }
+    
+            document.getElementById("centers").textContent = totalCenters;
+            document.getElementById("milkCollected").textContent = totalMilk;
+    
+            let tableContent = "";
+            allTableData.forEach(row => {
+                tableContent += `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${row[3]}</td></tr>`;
+            });
+            document.getElementById("tableData").innerHTML = tableContent;
+    
+            renderChart(allTableData);
+        }
+    
+        function renderChart(data) {
+            const milkByMonth = {
+                "Jan-2024": 0, "Feb-2024": 0, "Mar-2024": 0, "Apr-2024": 0,
+                "May-2024": 0, "Jun-2024": 0, "Jul-2024": 0, "Aug-2024": 0,
+                "Sep-2024": 0, "Oct-2024": 0, "Nov-2024": 0, "Dec-2024": 0
+            };
+    
+            data.forEach(item => {
+                const month = item[3];
+                milkByMonth[month] += item[2];
+            });
+    
+            const labels = Object.keys(milkByMonth);
+            const values = labels.map(month => milkByMonth[month]);
+    
+            if (milkChart) {
+                milkChart.destroy();
+            }
+    
+            const ctx = document.getElementById('milkChart').getContext('2d');
+            milkChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Milk Collected (Liters) - 2025',
+                        data: values,
+                        backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                        borderColor: 'rgba(40, 167, 69, 1)',
+                        borderWidth: 2,
+                        fill: true
+                    }]
+                },
+                options: {
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Milk Collected (Liters)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Month'
+                    }
+                }
+            }
+        }
+
+            });
+        }
+    
+        // Initial data load (all states)
+        filterData();
+    </script>
+    
+</body>
+</html>
