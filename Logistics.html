@@ -270,25 +270,35 @@
   });
 
   form.addEventListener('submit', (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const entry = {
-      routeId: document.getElementById('routeId').value,
-      from: document.getElementById('fromLocation').value,
-      to: document.getElementById('toLocation').value,
-      driverId: document.getElementById('driverId').value,
-      driverName: document.getElementById('driverName').value,
-      vehicle: document.getElementById('vehicleNumber').value,
-      status: document.getElementById('status').value,
-      log: document.getElementById('deliveryLog').value
-    };
+  const driverName = document.getElementById('driverName').value.trim();
 
-    logisticsData.push(entry);
-    renderTable();
-    form.reset();
-    renderCharts();
-    alert("Record saved successfully.");
-  });
+  // Validate driver name (letters and spaces only)
+  const nameRegex = /^[A-Za-z\s]+$/;
+  if (!nameRegex.test(driverName)) {
+    alert("Driver name should contain only letters and spaces.");
+    return;
+  }
+
+  const entry = {
+    routeId: document.getElementById('routeId').value,
+    from: document.getElementById('fromLocation').value,
+    to: document.getElementById('toLocation').value,
+    driverId: document.getElementById('driverId').value,
+    driverName: driverName,
+    vehicle: document.getElementById('vehicleNumber').value,
+    status: document.getElementById('status').value,
+    log: document.getElementById('deliveryLog').value
+  };
+
+  logisticsData.push(entry);
+  renderTable();
+  form.reset();
+  renderCharts();
+  alert("Record saved successfully.");
+});
+
 
   function renderTable() {
     recordsBody.innerHTML = '';
