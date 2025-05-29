@@ -190,139 +190,193 @@
     </div>
 
     <script>
-        const milkData = {
-            "Andhra Pradesh": {
-                centers: 2,
-                milk: 72000,
-                data: [
-                    ["Andhra Pradesh", "Penumur", 5000, "Jan-2024"],
-                    ["Andhra Pradesh", "Kurnool", 7000, "Feb-2024"],
-                    ["Andhra Pradesh", "Chittoor", 6500, "Mar-2024"],
-                    ["Andhra Pradesh", "Kadapa", 6200, "Apr-2024"],
-                    ["Andhra Pradesh", "Tirupati", 5900, "May-2024"],
-                    ["Andhra Pradesh", "Ongole", 6100, "Jun-2024"],
-                    ["Andhra Pradesh", "Nellore", 6300, "Jul-2024"],
-                    ["Andhra Pradesh", "Guntur", 6400, "Aug-2024"],
-                    ["Andhra Pradesh", "Vijayawada", 6600, "Sep-2024"],
-                    ["Andhra Pradesh", "Visakhapatnam", 6800, "Oct-2024"],
-                    ["Andhra Pradesh", "Kakinada", 6700, "Nov-2024"],
-                    ["Andhra Pradesh", "Rajahmundry", 6900, "Dec-2024"]
-                ]
-            },
-            "Telangana": {
-                centers: 2,
-                milk: 80000,
-                data: [
-                    ["Telangana", "Gundrampally", 6000, "Jan-2024"],
-                    ["Telangana", "Karimnagar", 8000, "Feb-2024"],
-                    ["Telangana", "Warangal", 7500, "Mar-2024"],
-                    ["Telangana", "Nalgonda", 7000, "Apr-2024"],
-                    ["Telangana", "Hyderabad", 7200, "May-2024"],
-                    ["Telangana", "Adilabad", 7300, "Jun-2024"],
-                    ["Telangana", "Mahbubnagar", 7100, "Jul-2024"],
-                    ["Telangana", "Khammam", 7400, "Aug-2024"],
-                    ["Telangana", "Suryapet", 7600, "Sep-2024"],
-                    ["Telangana", "Nizamabad", 7700, "Oct-2024"],
-                    ["Telangana", "Mancherial", 7800, "Nov-2024"],
-                    ["Telangana", "Jagityal", 7900, "Dec-2024"]
-                ]
-            }
-        };
-    
-        let milkChart = null;
-    
-        function filterData() {
-            const selectedState = document.getElementById("state").value;
-            let totalCenters = 0;
-            let totalMilk = 0;
-            let allTableData = [];
-    
-            if (selectedState === "all") {
-                for (const state in milkData) {
-                    totalCenters += milkData[state].centers;
-                    totalMilk += milkData[state].milk;
-                    allTableData = allTableData.concat(milkData[state].data);
-                }
-            } else if (milkData[selectedState]) {
-                totalCenters = milkData[selectedState].centers;
-                totalMilk = milkData[selectedState].milk;
-                allTableData = milkData[selectedState].data;
-            }
-    
-            document.getElementById("centers").textContent = totalCenters;
-            document.getElementById("milkCollected").textContent = totalMilk;
-    
-            let tableContent = "";
-            allTableData.forEach(row => {
-                tableContent += `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${row[3]}</td></tr>`;
-            });
-            document.getElementById("tableData").innerHTML = tableContent;
-    
-            renderChart(allTableData);
+    const milkData = {
+        "Andhra Pradesh": {
+            centers: 2,
+            milk: 72000,
+            data: [
+                ["Andhra Pradesh", "Penumur", 5000, "Jan-2024"],
+                ["Andhra Pradesh", "Kurnool", 7000, "Feb-2024"],
+                ["Andhra Pradesh", "Chittoor", 6500, "Mar-2024"],
+                ["Andhra Pradesh", "Kadapa", 6200, "Apr-2024"],
+                ["Andhra Pradesh", "Tirupati", 5900, "May-2024"],
+                ["Andhra Pradesh", "Ongole", 6100, "Jun-2024"],
+                ["Andhra Pradesh", "Nellore", 6300, "Jul-2024"],
+                ["Andhra Pradesh", "Guntur", 6400, "Aug-2024"],
+                ["Andhra Pradesh", "Vijayawada", 6600, "Sep-2024"],
+                ["Andhra Pradesh", "Visakhapatnam", 6800, "Oct-2024"],
+                ["Andhra Pradesh", "Kakinada", 6700, "Nov-2024"],
+                ["Andhra Pradesh", "Rajahmundry", 6900, "Dec-2024"]
+            ]
+        },
+        "Telangana": {
+            centers: 2,
+            milk: 80000,
+            data: [
+                ["Telangana", "Gundrampally", 6000, "Jan-2024"],
+                ["Telangana", "Karimnagar", 8000, "Feb-2024"],
+                ["Telangana", "Warangal", 7500, "Mar-2024"],
+                ["Telangana", "Nalgonda", 7000, "Apr-2024"],
+                ["Telangana", "Hyderabad", 7200, "May-2024"],
+                ["Telangana", "Adilabad", 7300, "Jun-2024"],
+                ["Telangana", "Mahbubnagar", 7100, "Jul-2024"],
+                ["Telangana", "Khammam", 7400, "Aug-2024"],
+                ["Telangana", "Suryapet", 7600, "Sep-2024"],
+                ["Telangana", "Nizamabad", 7700, "Oct-2024"],
+                ["Telangana", "Mancherial", 7800, "Nov-2024"],
+                ["Telangana", "Jagityal", 7900, "Dec-2024"]
+            ]
+        },
+        "Karnataka": {
+            centers: 3,
+            milk: 85000,
+            data: [
+                ["Karnataka", "Bangalore", 7000, "Jan-2024"],
+                ["Karnataka", "Mysore", 7200, "Feb-2024"],
+                ["Karnataka", "Hubli", 6800, "Mar-2024"],
+                ["Karnataka", "Mangalore", 6900, "Apr-2024"],
+                ["Karnataka", "Belgaum", 7100, "May-2024"],
+                ["Karnataka", "Tumkur", 7300, "Jun-2024"],
+                ["Karnataka", "Davangere", 7500, "Jul-2024"],
+                ["Karnataka", "Hassan", 7700, "Aug-2024"],
+                ["Karnataka", "Bellary", 7900, "Sep-2024"],
+                ["Karnataka", "Chikmagalur", 8000, "Oct-2024"],
+                ["Karnataka", "Gulbarga", 8200, "Nov-2024"],
+                ["Karnataka", "Shimoga", 8300, "Dec-2024"]
+            ]
+        },
+        "Tamil Nadu": {
+            centers: 2,
+            milk: 78000,
+            data: [
+                ["Tamil Nadu", "Chennai", 6500, "Jan-2024"],
+                ["Tamil Nadu", "Coimbatore", 6700, "Feb-2024"],
+                ["Tamil Nadu", "Madurai", 6400, "Mar-2024"],
+                ["Tamil Nadu", "Salem", 6600, "Apr-2024"],
+                ["Tamil Nadu", "Trichy", 6800, "May-2024"],
+                ["Tamil Nadu", "Tirunelveli", 6900, "Jun-2024"],
+                ["Tamil Nadu", "Vellore", 7100, "Jul-2024"],
+                ["Tamil Nadu", "Erode", 7200, "Aug-2024"],
+                ["Tamil Nadu", "Thanjavur", 7400, "Sep-2024"],
+                ["Tamil Nadu", "Karur", 7600, "Oct-2024"],
+                ["Tamil Nadu", "Cuddalore", 7800, "Nov-2024"],
+                ["Tamil Nadu", "Kanchipuram", 7900, "Dec-2024"]
+            ]
+        },
+        "Maharashtra": {
+            centers: 2,
+            milk: 91000,
+            data: [
+                ["Maharashtra", "Mumbai", 7500, "Jan-2024"],
+                ["Maharashtra", "Pune", 7700, "Feb-2024"],
+                ["Maharashtra", "Nagpur", 7800, "Mar-2024"],
+                ["Maharashtra", "Nashik", 7900, "Apr-2024"],
+                ["Maharashtra", "Aurangabad", 8100, "May-2024"],
+                ["Maharashtra", "Solapur", 8300, "Jun-2024"],
+                ["Maharashtra", "Amravati", 8500, "Jul-2024"],
+                ["Maharashtra", "Kolhapur", 8600, "Aug-2024"],
+                ["Maharashtra", "Sangli", 8700, "Sep-2024"],
+                ["Maharashtra", "Latur", 8800, "Oct-2024"],
+                ["Maharashtra", "Akola", 8900, "Nov-2024"],
+                ["Maharashtra", "Jalgaon", 9000, "Dec-2024"]
+            ]
         }
-    
-        function renderChart(data) {
-            const milkByMonth = {
-                "Jan-2024": 0, "Feb-2024": 0, "Mar-2024": 0, "Apr-2024": 0,
-                "May-2024": 0, "Jun-2024": 0, "Jul-2024": 0, "Aug-2024": 0,
-                "Sep-2024": 0, "Oct-2024": 0, "Nov-2024": 0, "Dec-2024": 0
-            };
-    
-            data.forEach(item => {
-                const month = item[3];
-                milkByMonth[month] += item[2];
-            });
-    
-            const labels = Object.keys(milkByMonth);
-            const values = labels.map(month => milkByMonth[month]);
-    
-            if (milkChart) {
-                milkChart.destroy();
+    };
+
+    let milkChart = null;
+
+    function filterData() {
+        const selectedState = document.getElementById("state").value;
+        let totalCenters = 0;
+        let totalMilk = 0;
+        let allTableData = [];
+
+        if (selectedState === "all") {
+            for (const state in milkData) {
+                totalCenters += milkData[state].centers;
+                totalMilk += milkData[state].milk;
+                allTableData = allTableData.concat(milkData[state].data);
             }
-    
-            const ctx = document.getElementById('milkChart').getContext('2d');
-            milkChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Milk Collected (Liters) - 2025',
-                        data: values,
-                        backgroundColor: 'rgba(40, 167, 69, 0.2)',
-                        borderColor: 'rgba(40, 167, 69, 1)',
-                        borderWidth: 2,
-                        fill: true
-                    }]
-                },
-                options: {
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Milk Collected (Liters)'
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Month'
-                    }
-                }
-            }
+        } else if (milkData[selectedState]) {
+            totalCenters = milkData[selectedState].centers;
+            totalMilk = milkData[selectedState].milk;
+            allTableData = milkData[selectedState].data;
         }
 
-            });
+        document.getElementById("centers").textContent = totalCenters;
+        document.getElementById("milkCollected").textContent = totalMilk;
+
+        let tableContent = "";
+        allTableData.forEach(row => {
+            tableContent += `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${row[3]}</td></tr>`;
+        });
+        document.getElementById("tableData").innerHTML = tableContent;
+
+        renderChart(allTableData);
+    }
+
+    function renderChart(data) {
+        const milkByMonth = {
+            "Jan-2024": 0, "Feb-2024": 0, "Mar-2024": 0, "Apr-2024": 0,
+            "May-2024": 0, "Jun-2024": 0, "Jul-2024": 0, "Aug-2024": 0,
+            "Sep-2024": 0, "Oct-2024": 0, "Nov-2024": 0, "Dec-2024": 0
+        };
+
+        data.forEach(item => {
+            const month = item[3];
+            milkByMonth[month] += item[2];
+        });
+
+        const labels = Object.keys(milkByMonth);
+        const values = labels.map(month => milkByMonth[month]);
+
+        if (milkChart) {
+            milkChart.destroy();
         }
-    
-        // Initial data load (all states)
-        filterData();
-    </script>
+
+        const ctx = document.getElementById('milkChart').getContext('2d');
+        milkChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Milk Collected (Liters) - 2024',
+                    data: values,
+                    backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                    borderColor: 'rgba(40, 167, 69, 1)',
+                    borderWidth: 2,
+                    fill: true
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Milk Collected (Liters)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Month'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Initial data load
+    filterData();
+</script>
+
     
 </body>
 </html>
